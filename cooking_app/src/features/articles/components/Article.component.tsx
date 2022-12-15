@@ -7,9 +7,12 @@ import {
   CardMedia,
   Button,
   Typography,
+  StyledEngineProvider,
 } from '@mui/material';
 import { ArticleDocument } from '../models/Article';
 import { useAppDispatch, useAppSelector } from '../../../hooks/input/redux/hooks';
+import React from 'react';
+import Fullscreen from '../../fullscreen/fullscreenfuction'
 
 
 interface ArticleComponentProps {
@@ -51,6 +54,12 @@ const ArticleComponent: FC<ArticleComponentProps> = ({ article }) => {
             {article.description}
           </Typography>
         )}
+
+<React.StrictMode>
+    <StyledEngineProvider injectFirst>
+      <Fullscreen key={article._id} article={article}/>
+    </StyledEngineProvider>
+  </React.StrictMode>
       </CardContent>
     </Card>
   );
