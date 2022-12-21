@@ -14,12 +14,11 @@ const CommentComponent:FC<CommentComponentProps>=({comment})=>{
     return(
         <Box
             sx={{
-                    border:1,
-                    padding:0.2,
+                    border:4,
                     borderColor:'#cccccc',
-                    marginTop:0.5
+                    marginTop:0
                 }}>
-                <Box sx={{marginTop:0.2,marginLeft:5}}><h5>{comment.name}</h5></Box>
+                <Box sx={{marginLeft:5}}><h5>{comment.name}</h5></Box>
                 <Box sx={{textAlign:'center',marginBottom:3}}>{comment.text}</Box>
 
         </Box>
