@@ -11,7 +11,7 @@ import { FC } from 'react';
 import { ArticleDocument } from '../articles/models/Article';
 import { Card, CardMedia, Typography } from '@mui/material';
 import { CommentDocument } from '../comments/model/Comment';
-import CommentComponent from '../comments/commentfunction';
+import CommentsComponent from '../comments/commentfunction';
 
 interface ArticleComponentProps {
   article: ArticleDocument;
@@ -79,7 +79,7 @@ const ResponsiveDialog:FC<ArticleComponentProps> = ({ article }) => {
           <DialogContentText>
             {article.description}
           </DialogContentText>
-          <CommentComponent key={article._id} article={article}/>
+          <CommentsComponent key={article._id} article={article}/>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} autoFocus>

@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from "../../hooks/input/redux/hooks";
 import useInput from "../../hooks/input/use-input";
 import { ArticleDocument } from "../articles/models/Article";
 import { selectedUser } from "../auth/authSlice";
+import CommentComponent from "./Comment.component";
 import { getComments, reset, sendComment } from "./commentSlice";
 import { CommentDocument } from "./model/Comment";
 import { NewComment } from "./model/NewComment";
@@ -17,7 +18,7 @@ interface CommentComponentProps{
     comment: CommentDocument;
 }
 
-const CommentComponent: FC <ArticleComponentProps>=({ article })=>{
+const CommentsComponent: FC <ArticleComponentProps>=({ article })=>{
 
     const { comments } = useAppSelector((state) => state.comment);
 
@@ -93,17 +94,7 @@ const CommentComponent: FC <ArticleComponentProps>=({ article })=>{
             }}
         >
                 {comments.length > 0 && comments.map((comment) => (
-                    <Box
-                    sx={{
-                        border:1,
-                        padding:0.2,
-                        borderColor:'#cccccc',
-                        marginTop:0.5
-                    }}>
-                        <Box sx={{marginTop:0.2,marginLeft:5}}><h5>{comment.name}</h5></Box>
-                        <Box sx={{textAlign:'center',marginBottom:3}}>{comment.text}</Box>
-
-                    </Box>
+                    <CommentComponent key={comment._id} comment={comment} />
                 ))
                 }
                 
@@ -147,4 +138,4 @@ const CommentComponent: FC <ArticleComponentProps>=({ article })=>{
     )
 }
 
-export default CommentComponent
+export default CommentsComponent

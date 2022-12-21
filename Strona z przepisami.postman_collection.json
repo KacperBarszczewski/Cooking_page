@@ -15,7 +15,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"title\": \"Pierogi3\",\r\n    \"description\": \"Zrobić pierogi\",\r\n    \"ingredients\": [\r\n        \"jajka\",\r\n        \"mleko\"\r\n    ]\r\n}",
+							"raw": "{\r\n    \"title\": \"Pierogi\",\r\n    \"description\": \"Zrobić pierogi\",\r\n    \"ingredients\": [\r\n        \"jajka\",\r\n        \"mleko\"\r\n    ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -312,6 +312,26 @@
 								"api",
 								"comment",
 								"6395eabef87ad0d0125a80e1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:3000/api/comment",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/comment",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"comment"
 							]
 						}
 					},
