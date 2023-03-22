@@ -1,0 +1,2 @@
+{"_id":{"$oid":"639a37afc8038b3089a8e7fa"},"name":"Kacper","text":"test","article_id":{"$oid":"6395eabef87ad0d0125a80e1"},"isVisible":true,"__v":0}
+{"_id":{"$oid":"639a37f0c8038b3089a8e7fc"},"name":"Kacper","text":"test","article_id":{"$oid":"6395eabef87ad0d0125a80e1"},"isVisible":true,"__v":0}
