@@ -10,7 +10,7 @@ services:
     ports:
       - 27017:27017
     volumes:
-      - ./data/db:/data/db
+      - ./db/data/db:/data/db
 
   mongo-express:
     container_name: mongo-express
