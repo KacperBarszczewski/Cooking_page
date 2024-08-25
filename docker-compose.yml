@@ -11,6 +11,8 @@ services:
       - 27017:27017
     volumes:
       - ./db/data/db:/data/db
+    networks:
+      - myNetwork
 
   mongo-express:
     container_name: mongo-express
@@ -18,9 +20,29 @@ services:
     environment:
       - ME_CONFIG_MONGODB_SERVER=mongo
       - ME_CONFIG_MONGODB_PORT=27017
+      - ME_CONFIG_MONGODB_URL=mongodb://mongo:27017/
       - ME_CONFIG_BASICAUTH_USERNAME=admin
       - ME_CONFIG_BASICAUTH_PASSWORD=admin
     depends_on:
       - mongo
     ports:
       - 8081:8081
+    networks:
+      - myNetwork
+
+  api:
+    container_name: api
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/articles
+    build: ./api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+    networks:
+      - myNetwork
+
+networks:
+  myNetwork:
+    name: myNetwork
+    driver: bridge
