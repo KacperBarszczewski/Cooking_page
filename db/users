@@ -1,2 +1,0 @@
-{"_id":{"$oid":"639a4e57c8038b3089a8e808"},"name":"Jon","email":"jon@test.com","password":"$2b$12$S0T9Vr5.9QP3urasG3Pq7OsuJVJxPKBIgyZJ8nT4tSAz394MKp2dO","isAdmin":false,"__v":0}
-{"_id":{"$oid":"639a4e82c8038b3089a8e80b"},"name":"root","email":"root@root.com","password":"$2b$12$4cZKDhgVJoVmq9EWhJJxeuyeHzfoeaFl/7LT1GJ6sHqSc0SoV3Xrm","isAdmin":false,"__v":0}
