@@ -6,18 +6,21 @@ services:
     container_name: mongo
     image: mongo:6.0.3
     environment:
-      - MONGO_DATABASE="articles"
+      - MONGO_DATABASE="cooking_data"
     ports:
       - 27017:27017
-  
+    volumes:
+      - ./data/db:/data/db
+
   mongo-express:
     container_name: mongo-express
     image: mongo-express
     environment:
       - ME_CONFIG_MONGODB_SERVER=mongo
       - ME_CONFIG_MONGODB_PORT=27017
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin
     depends_on:
       - mongo
     ports:
       - 8081:8081
-
