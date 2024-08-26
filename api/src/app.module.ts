@@ -7,6 +7,7 @@ import { ArticleModule } from './article/article.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { CommentModule } from './comment/comment.module';
+import { SeederModule } from './seeders/seeder.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { CommentModule } from './comment/comment.module';
     UserModule,
     AuthModule,
     CommentModule,
+    SeederModule
   ],
   controllers: [AppController],
   providers: [AppService],
