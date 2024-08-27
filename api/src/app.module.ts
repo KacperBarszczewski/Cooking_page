@@ -11,14 +11,16 @@ import { SeederModule } from './seeders/seeder.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot(process.env.MONGO_URL || 'mongodb://localhost:27017/articles'),
+    MongooseModule.forRoot(
+      process.env.MONGO_URL || 'mongodb://localhost:27017/articles',
+    ),
     ArticleModule,
     UserModule,
     AuthModule,
     CommentModule,
-    SeederModule
+    SeederModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

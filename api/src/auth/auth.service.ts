@@ -10,64 +10,78 @@ import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class AuthService {
-    constructor(private userService: UserService, private jwtService: JwtService){}
+  constructor(
+    private userService: UserService,
+    private jwtService: JwtService,
+  ) {}
 
-     async hashPassword(password: string): Promise<string> {
-          return bcrypt.hash(password, 12);
-     }
+  async hashPassword(password: string): Promise<string> {
+    return bcrypt.hash(password, 12);
+  }
 
-     async register(user: Readonly<NewUserDTO>): Promise<UserDetails | any>{
-          const {name,email,password}=user;
+  async register(user: Readonly<NewUserDTO>): Promise<UserDetails | any> {
+    const { name, email, password } = user;
 
-          const existingUser =  await this.userService.findByEmail(email);
+    const existingUser = await this.userService.findByEmail(email);
 
-          if(existingUser) throw new HttpException('Konto z tym e-mailem już istniej', HttpStatus.CONFLICT);
+    if (existingUser)
+      throw new HttpException(
+        'Konto z tym e-mailem już istniej',
+        HttpStatus.CONFLICT,
+      );
 
-          const hashedPassword = await this.hashPassword(password);
+    const hashedPassword = await this.hashPassword(password);
 
-          const newUser = await this.userService.create(name,email,hashedPassword);
+    const newUser = await this.userService.create(name, email, hashedPassword);
 
-          return this.userService._getUserDetails(newUser);
-     }
+    return this.userService._getUserDetails(newUser);
+  }
 
-     async doesPasswordMatch( password: string, hashedPassword: string): Promise<boolean> {
-               return bcrypt.compare(password,hashedPassword);
-     }
+  async doesPasswordMatch(
+    password: string,
+    hashedPassword: string,
+  ): Promise<boolean> {
+    return bcrypt.compare(password, hashedPassword);
+  }
 
-     async validateUser(email: string,password: string ):Promise<UserDetails|null>{
-          const user = await this.userService.findByEmail(email);
-          const doesUserExist = !!user;
+  async validateUser(
+    email: string,
+    password: string,
+  ): Promise<UserDetails | null> {
+    const user = await this.userService.findByEmail(email);
+    const doesUserExist = !!user;
 
-          if(!doesUserExist) return null;
-          
-          const doesPasswordMatch = await this.doesPasswordMatch(password,user.password );
+    if (!doesUserExist) return null;
 
-          if(!doesPasswordMatch) return null;
+    const doesPasswordMatch = await this.doesPasswordMatch(
+      password,
+      user.password,
+    );
 
-          return this.userService._getUserDetails(user);
-     }
+    if (!doesPasswordMatch) return null;
 
-     async login(existingUser: ExistingUserDTO):Promise<{token: string}|null>{
-          const {email, password}=existingUser;
-          const user = await this.validateUser(email,password);
+    return this.userService._getUserDetails(user);
+  }
 
-          if(!user) throw new HttpException('Błędne dane', HttpStatus.UNAUTHORIZED);;
+  async login(
+    existingUser: ExistingUserDTO,
+  ): Promise<{ token: string } | null> {
+    const { email, password } = existingUser;
+    const user = await this.validateUser(email, password);
 
-          const jwt = await this.jwtService.signAsync({user});
-          return {token: jwt};
-     }
+    if (!user) throw new HttpException('Błędne dane', HttpStatus.UNAUTHORIZED);
 
-     async verifyJwt(jwt: string): Promise<{ exp: number }> {
-          try {
-            const { exp } = await this.jwtService.verifyAsync(jwt);
+    const jwt = await this.jwtService.signAsync({ user });
+    return { token: jwt };
+  }
 
-            return { exp };
+  async verifyJwt(jwt: string): Promise<{ exp: number }> {
+    try {
+      const { exp } = await this.jwtService.verifyAsync(jwt);
 
-          } catch (error) {
-               
-            throw new HttpException('Invalid JWT', HttpStatus.UNAUTHORIZED);
-          }
-     }
-
-
+      return { exp };
+    } catch (error) {
+      throw new HttpException('Invalid JWT', HttpStatus.UNAUTHORIZED);
+    }
+  }
 }
