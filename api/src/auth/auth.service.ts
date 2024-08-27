@@ -21,7 +21,6 @@ export class AuthService {
 
   async register(user: Readonly<NewUserDTO>): Promise<UserDetails | any> {
     const { name, email, password } = user;
-
     const existingUser = await this.userService.findByEmail(email);
 
     if (existingUser)
@@ -31,7 +30,6 @@ export class AuthService {
       );
 
     const hashedPassword = await this.hashPassword(password);
-
     const newUser = await this.userService.create(name, email, hashedPassword);
 
     return this.userService._getUserDetails(newUser);
