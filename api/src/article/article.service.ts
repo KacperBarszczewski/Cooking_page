@@ -1,37 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { ArticleDocument } from './article.schema';
+import { Article } from './article.schema';
+import { CreateArticleDto } from './dto/CreateArticle.dto';
 
 @Injectable()
 export class ArticleService {
   constructor(
-    @InjectModel('Article')
-    private readonly articleModel: Model<ArticleDocument>,
+    @InjectModel(Article.name)
+    private articleModel: Model<Article>,
   ) {}
 
-  async create(
-    title: string,
-    description: string,
-    ingredients: string[],
-    isVisible: boolean,
-    image: string,
-  ): Promise<ArticleDocument> {
-    const newArticle = new this.articleModel({
-      title,
-      description,
-      ingredients,
-      isVisible,
-      image,
-    });
+  async create(createArticleDto: CreateArticleDto): Promise<Article> {
+    const newArticle = new this.articleModel(createArticleDto);
     return newArticle.save();
   }
 
-  async findAll(): Promise<ArticleDocument[]> {
+  async findAll(): Promise<Article[]> {
     return this.articleModel.find().exec();
   }
 
-  async find(id: string): Promise<ArticleDocument> {
+  async find(id: string): Promise<Article> {
     return this.articleModel.findById(id).exec();
   }
 
@@ -42,8 +31,7 @@ export class ArticleService {
     newIngredients: string[],
     newIsVisible: boolean,
     newImage: string,
-    newDate: Date,
-  ): Promise<ArticleDocument> {
+  ): Promise<Article> {
     const existingArticle = await this.find(id);
 
     existingArticle.title = newTitle ?? existingArticle.title;
@@ -51,12 +39,12 @@ export class ArticleService {
     existingArticle.ingredients = newIngredients ?? existingArticle.ingredients;
     existingArticle.isVisible = newIsVisible ?? existingArticle.isVisible;
     existingArticle.image = newImage ?? existingArticle.image;
-    existingArticle.date = newDate;
+    existingArticle.date = new Date();
 
-    return existingArticle.save();
+    return this.articleModel.findByIdAndUpdate(id, existingArticle).exec();
   }
 
-  async delate(id: string) {
+  async delete(id: string) {
     return this.articleModel.deleteOne({ _id: id }).exec();
   }
 }
