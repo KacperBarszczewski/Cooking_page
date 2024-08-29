@@ -6,51 +6,41 @@ import {
   Param,
   Patch,
   Post,
+  UsePipes,
 } from '@nestjs/common';
-import { ArticleDocument } from './article.schema';
 import { ArticleService } from './article.service';
+import { CreateArticleDto } from './dto/CreateArticle.dto';
+import { CreateArticleValidationPipe } from './pipes/CreateArticleValidationPipe';
 
 @Controller('article')
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
   @Post()
-  createPost(
-    @Body('title') title: string,
-    @Body('description') description: string,
-    @Body('ingredients') ingredients: string[],
-    @Body('isVisible') isVisible: boolean,
-    @Body('image') image: string,
-  ): Promise<ArticleDocument> {
-    return this.articleService.create(
-      title,
-      description,
-      ingredients,
-      isVisible,
-      image,
-    );
+  @UsePipes(CreateArticleValidationPipe)
+  async createPost(@Body() createArticleDto: CreateArticleDto) {
+    return this.articleService.create(createArticleDto);
   }
 
   @Get()
-  findAllArticles(): Promise<ArticleDocument[]> {
+  async findAllArticles() {
     return this.articleService.findAll();
   }
 
   @Get(':id')
-  findArticle(@Param('id') id: string): Promise<ArticleDocument> {
+  async findArticle(@Param('id') id: string) {
     return this.articleService.find(id);
   }
 
   @Patch(':id')
-  updateArticle(
+  async updateArticle(
     @Param('id') id: string,
     @Body('title') title: string,
     @Body('description') description: string,
     @Body('ingredients') ingredients: string[],
     @Body('isVisible') isVisible: boolean,
     @Body('image') image: string,
-    date: Date,
-  ): Promise<ArticleDocument> {
+  ) {
     return this.articleService.update(
       id,
       title,
@@ -58,12 +48,11 @@ export class ArticleController {
       ingredients,
       isVisible,
       image,
-      date,
     );
   }
 
   @Delete(':id')
-  delateArticle(@Param('id') id: string) {
-    return this.articleService.delate(id);
+  async delateArticle(@Param('id') id: string) {
+    return this.articleService.delete(id);
   }
 }
