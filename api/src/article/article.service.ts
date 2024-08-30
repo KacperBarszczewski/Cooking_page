@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Article } from './article.schema';
 import { CreateArticleDto } from './dto/CreateArticle.dto';
+import { UpdateArticleDto } from './dto/UpdateArticle.dto';
 
 @Injectable()
 export class ArticleService {
@@ -26,25 +27,16 @@ export class ArticleService {
 
   async update(
     id: string,
-    newTitle: string,
-    newDescription: string,
-    newIngredients: string[],
-    newIsVisible: boolean,
-    newImage: string,
+    updateArticleDto: UpdateArticleDto,
   ): Promise<Article> {
-    const existingArticle = await this.find(id);
+    const date = new Date();
 
-    existingArticle.title = newTitle ?? existingArticle.title;
-    existingArticle.description = newDescription ?? existingArticle.description;
-    existingArticle.ingredients = newIngredients ?? existingArticle.ingredients;
-    existingArticle.isVisible = newIsVisible ?? existingArticle.isVisible;
-    existingArticle.image = newImage ?? existingArticle.image;
-    existingArticle.date = new Date();
-
-    return this.articleModel.findByIdAndUpdate(id, existingArticle).exec();
+    return this.articleModel
+      .findByIdAndUpdate(id, { ...updateArticleDto, date }, { new: true })
+      .exec();
   }
 
   async delete(id: string) {
-    return this.articleModel.deleteOne({ _id: id }).exec();
+    return this.articleModel.findByIdAndDelete(id).exec();
   }
 }
