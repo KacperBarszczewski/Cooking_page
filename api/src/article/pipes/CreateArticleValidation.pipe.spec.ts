@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { CreateArticleDto } from '../dto/CreateArticle.dto';
-import { CreateArticleValidationPipe } from './CreateArticleValidationPipe';
+import { CreateArticleValidationPipe } from './CreateArticleValidation.pipe';
 
 describe('CreateArticleValidationPipe', () => {
   let pipe: CreateArticleValidationPipe;

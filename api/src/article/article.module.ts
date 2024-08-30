@@ -3,7 +3,7 @@ import { ArticleService } from './article.service';
 import { ArticleController } from './article.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Article, ArticleSchema } from './article.schema';
-import { ValidateArticleExistsMiddleware } from './middleware/validateArticle.middleware';
+import { ValidateArticleExistsMiddleware } from './middlewares/validateArticle.middleware';
 
 @Module({
   imports: [

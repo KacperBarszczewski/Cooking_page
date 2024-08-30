@@ -10,9 +10,9 @@ import {
 } from '@nestjs/common';
 import { ArticleService } from './article.service';
 import { CreateArticleDto } from './dto/CreateArticle.dto';
-import { CreateArticleValidationPipe } from './pipes/CreateArticleValidationPipe';
+import { CreateArticleValidationPipe } from './pipes/CreateArticleValidation.pipe';
 import { UpdateArticleDto } from './dto/UpdateArticle.dto';
-import { UpdateArticleValidationPipe } from './pipes/UpdateArticleValidationPipe';
+import { UpdateArticleValidationPipe } from './pipes/UpdateArticleValidation.pipe';
 
 @Controller('article')
 export class ArticleController {
