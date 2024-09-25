@@ -13,8 +13,7 @@ export class ArticleService {
   ) {}
 
   async create(createArticleDto: CreateArticleDto): Promise<Article> {
-    const newArticle = new this.articleModel(createArticleDto);
-    return newArticle.save();
+    return this.articleModel.create(createArticleDto);
   }
 
   async findAll(): Promise<Article[]> {
