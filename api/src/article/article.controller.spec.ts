@@ -102,7 +102,10 @@ describe('ArticleController', () => {
         updateArticleDto,
       );
 
-      expect(mockArticleService.update).toHaveBeenCalled();
+      expect(articleService.update).toHaveBeenCalledWith(
+        mockArticle._id,
+        updateArticleDto,
+      );
       expect(result).toEqual(updatedArticle);
     });
   });
@@ -111,7 +114,7 @@ describe('ArticleController', () => {
     it('should delete a article by ID', async () => {
       const result = await articleController.deleteArticle(mockArticle._id);
 
-      expect(mockArticleService.delete).toHaveBeenCalled();
+      expect(articleService.delete).toHaveBeenCalledWith(mockArticle._id);
       expect(result).toEqual({ delete: true });
     });
   });
