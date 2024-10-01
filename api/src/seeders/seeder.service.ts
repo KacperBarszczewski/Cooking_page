@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Article, ArticleDocument } from '../article/article.schema';
-import { Comment, CommentDocument } from '../comment/comment.schema';
 import { User, UserDocument } from '../user/user.schema';
 import * as fs from 'fs';
 import * as path from 'path';
+import { Comment, CommentDocument } from 'src/comment/schemas/comment.schema';
 
 @Injectable()
 export class SeederService {
