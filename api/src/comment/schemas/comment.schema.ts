@@ -3,7 +3,9 @@ import mongoose, { HydratedDocument } from 'mongoose';
 
 export type CommentDocument = HydratedDocument<Comment>;
 
-@Schema()
+@Schema({
+  timestamps: true,
+})
 export class Comment {
   @Prop({ type: String, required: true })
   name: string;

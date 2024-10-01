@@ -1,35 +1,40 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CommentDocument } from './comment.schema';
+import { Comment, CommentDocument } from './schemas/comment.schema';
 
 @Injectable()
 export class CommentService {
   constructor(
-    @InjectModel('Comment')
-    private readonly commentModel: Model<CommentDocument>,
+    @InjectModel(Comment.name)
+    private commentModel: Model<Comment>,
   ) {}
 
-  async create(
-    name: string,
-    text: string,
-    article_id: string,
-    isVisible: boolean,
-  ): Promise<CommentDocument> {
-    const newComment = new this.commentModel({
-      name,
-      text,
-      article_id,
-      isVisible,
-    });
+  async create(comment: Comment): Promise<CommentDocument> {
+    const newComment = new this.commentModel(comment);
     return newComment.save();
   }
 
-  async findAll(): Promise<CommentDocument[]> {
-    return this.commentModel.find().exec();
+  async findAll(): Promise<Comment[]> {
+    return this.commentModel.find();
   }
 
-  async find(a_id: string): Promise<CommentDocument[]> {
-    return this.commentModel.find({ article_id: a_id }).exec();
+  async findById(id: string): Promise<Comment> {
+    const comment = await this.commentModel.findById(id);
+
+    if (!comment) throw new NotFoundException('Comment not found');
+
+    return comment;
+  }
+
+  async updateById(id: string, comment: Comment): Promise<Comment> {
+    return await this.commentModel.findByIdAndUpdate(id, comment, {
+      new: true,
+      runValidators: true,
+    });
+  }
+
+  async deleteById(id: string): Promise<Comment> {
+    return await this.commentModel.findByIdAndDelete(id);
   }
 }

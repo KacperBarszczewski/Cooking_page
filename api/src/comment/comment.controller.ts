@@ -1,25 +1,43 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { CommentDocument } from './comment.schema';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { CommentService } from './comment.service';
+import { Comment } from './schemas/comment.schema';
+import { CreateCommentDto } from './dto/create-comment.dto';
+import { UpdateCommentDto } from './dto/update-comment.dto';
 
 @Controller('comment')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
-  @Post()
-  createPost(
-    @Body('name') name: string,
-    @Body('text') text: string,
-    @Body('article_id') article_id: string,
-    @Body('isVisible') isVisible: boolean,
-  ): Promise<CommentDocument> {
-    return this.commentService.create(name, text, article_id, isVisible);
+  @Get()
+  getAllComments(): Promise<Comment[]> {
+    return this.commentService.findAll();
   }
 
-  @Get(':article_id')
-  findArticle(
-    @Param('article_id') article_id: string,
-  ): Promise<CommentDocument[]> {
-    return this.commentService.find(article_id);
+  @Get(':id')
+  findComment(@Param('id') id: string): Promise<Comment> {
+    return this.commentService.findById(id);
+  }
+
+  @Post()
+  createPost(@Body() comment: CreateCommentDto): Promise<Comment> {
+    return this.commentService.create(comment);
+  }
+
+  @Put(':id')
+  updateComment(@Param('id') id: string, @Body() comment: UpdateCommentDto) {
+    return this.updateComment(id, comment);
+  }
+
+  @Delete(':id')
+  deleteComment(@Param('id') id: string): Promise<Comment> {
+    return this.commentService.deleteById(id);
   }
 }
