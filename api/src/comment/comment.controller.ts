@@ -14,13 +14,17 @@ import { Comment } from './schemas/comment.schema';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '../auth/enums/role.enum';
+import { RolesGuard } from '../auth/guards/roles.guard';
 
 @Controller('comment')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
   @Get()
-  @UseGuards(AuthGuard())
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard(), RolesGuard)
   getAllComments(): Promise<Comment[]> {
     return this.commentService.findAll();
   }

@@ -6,6 +6,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Comment, CommentDocument } from '../comment/schemas/comment.schema';
 import { User } from '../auth/schemas/user.schema';
+import { Role } from '../auth/enums/role.enum';
 
 @Injectable()
 export class SeederService {
@@ -29,14 +30,13 @@ export class SeederService {
         email: 'root@root.com',
         password:
           '$2b$12$4cZKDhgVJoVmq9EWhJJxeuyeHzfoeaFl/7LT1GJ6sHqSc0SoV3Xrm',
-        isAdmin: true,
+        role: Role.Admin,
       },
       {
         name: 'Jon',
         email: 'jon@test.com',
         password:
           '$2b$12$S0T9Vr5.9QP3urasG3Pq7OsuJVJxPKBIgyZJ8nT4tSAz394MKp2dO',
-        isAdmin: false,
       },
     ];
 
