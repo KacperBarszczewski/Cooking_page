@@ -6,17 +6,21 @@ import {
   Param,
   Post,
   Put,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { Comment } from './schemas/comment.schema';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('comment')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
   @Get()
+  @UseGuards(AuthGuard())
   getAllComments(): Promise<Comment[]> {
     return this.commentService.findAll();
   }
@@ -27,7 +31,12 @@ export class CommentController {
   }
 
   @Post()
-  createPost(@Body() comment: CreateCommentDto): Promise<Comment> {
+  @UseGuards(AuthGuard())
+  createComment(
+    @Body() comment: CreateCommentDto,
+    @Req() req,
+  ): Promise<Comment> {
+    console.log(req.user);
     return this.commentService.create(comment);
   }
 

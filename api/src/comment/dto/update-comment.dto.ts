@@ -1,4 +1,5 @@
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsEmpty, IsOptional, IsString } from 'class-validator';
+import { User } from '../../user/user.schema';
 
 export class UpdateCommentDto {
   @IsOptional()
@@ -15,4 +16,7 @@ export class UpdateCommentDto {
   @IsOptional()
   @IsBoolean()
   readonly isVisible: boolean;
+
+  @IsEmpty({ message: 'You cannot pass user id' })
+  readonly user: User;
 }
