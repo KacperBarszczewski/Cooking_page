@@ -1,28 +1,19 @@
-import { Body, Controller, HttpCode, Post } from '@nestjs/common';
-import { HttpStatus } from '@nestjs/common/enums';
-import { ExistingUserDTO } from 'src/user/dtos/existing-user.dto';
-import { NewUserDTO } from 'src/user/dtos/new-user.dto';
-import { UserDetails } from 'src/user/user-details.interface';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { SignUpDto } from './dto/signup.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Post('register')
-  register(@Body() user: NewUserDTO): Promise<UserDetails | null> {
-    return this.authService.register(user);
+  @Post('signup')
+  signUp(@Body() signUpDto: SignUpDto): Promise<{ token: string }> {
+    return this.authService.singUp(signUpDto);
   }
 
-  @Post('login')
-  @HttpCode(HttpStatus.OK)
-  login(@Body() user: ExistingUserDTO): Promise<{ token: string } | null> {
-    return this.authService.login(user);
-  }
-
-  @Post('verify-jwt')
-  @HttpCode(HttpStatus.OK)
-  verifyJwt(@Body() payload: { jwt: string }) {
-    return this.authService.verifyJwt(payload.jwt);
+  @Get('login')
+  login(@Body() loginDto: LoginDto): Promise<{ token: string }> {
+    return this.authService.login(loginDto);
   }
 }
