@@ -2,15 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Article, ArticleDocument } from '../article/article.schema';
-import { User, UserDocument } from '../user/user.schema';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Comment, CommentDocument } from 'src/comment/schemas/comment.schema';
+import { User } from 'src/auth/schemas/user.schema';
 
 @Injectable()
 export class SeederService {
   constructor(
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(Comment.name)
     private readonly commentModel: Model<CommentDocument>,
     @InjectModel(Article.name)

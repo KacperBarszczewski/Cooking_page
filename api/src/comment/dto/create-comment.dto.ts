@@ -5,7 +5,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { User } from '../../user/user.schema';
+import { User } from '../../auth/schemas/user.schema';
 
 export class CreateCommentDto {
   @IsNotEmpty()
