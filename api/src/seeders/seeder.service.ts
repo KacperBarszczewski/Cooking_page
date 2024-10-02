@@ -4,8 +4,8 @@ import { Model } from 'mongoose';
 import { Article, ArticleDocument } from '../article/article.schema';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Comment, CommentDocument } from 'src/comment/schemas/comment.schema';
-import { User } from 'src/auth/schemas/user.schema';
+import { Comment, CommentDocument } from '../comment/schemas/comment.schema';
+import { User } from '../auth/schemas/user.schema';
 
 @Injectable()
 export class SeederService {
@@ -23,7 +23,7 @@ export class SeederService {
       'utf8',
     );
 
-    const users: Array<User> = [
+    const users = [
       {
         name: 'root',
         email: 'root@root.com',

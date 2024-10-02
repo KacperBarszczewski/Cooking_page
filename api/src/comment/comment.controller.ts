@@ -36,8 +36,7 @@ export class CommentController {
     @Body() comment: CreateCommentDto,
     @Req() req,
   ): Promise<Comment> {
-    console.log(req.user);
-    return this.commentService.create(comment);
+    return this.commentService.create(comment, req.user);
   }
 
   @Put(':id')
