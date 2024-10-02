@@ -1,6 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { Comment, CommentDocument } from './schemas/comment.schema';
 
 @Injectable()
@@ -20,8 +24,10 @@ export class CommentService {
   }
 
   async findById(id: string): Promise<Comment> {
-    const comment = await this.commentModel.findById(id);
+    const isValidId = mongoose.isValidObjectId(id);
+    if (!isValidId) throw new BadRequestException('Incorrect ID');
 
+    const comment = await this.commentModel.findById(id);
     if (!comment) throw new NotFoundException('Comment not found');
 
     return comment;
