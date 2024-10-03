@@ -44,11 +44,13 @@ export class CommentController {
   }
 
   @Put(':id')
+  @UseGuards(AuthGuard())
   updateComment(@Param('id') id: string, @Body() comment: UpdateCommentDto) {
     return this.updateComment(id, comment);
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard())
   deleteComment(@Param('id') id: string): Promise<Comment> {
     return this.commentService.deleteById(id);
   }

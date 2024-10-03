@@ -23,7 +23,7 @@ export class CommentService {
   }
 
   async findAll(): Promise<Comment[]> {
-    return this.commentModel.find();
+    return this.commentModel.find().populate('user', 'name email');
   }
 
   async findById(id: string): Promise<Comment> {
