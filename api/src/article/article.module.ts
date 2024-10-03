@@ -11,6 +11,7 @@ import { ValidateArticleExistsMiddleware } from './middlewares/validateArticle.m
   ],
   controllers: [ArticleController],
   providers: [ArticleService],
+  exports: [MongooseModule],
 })
 export class ArticleModule {
   configure(consumer: MiddlewareConsumer) {

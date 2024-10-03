@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
 
 export type ArticleDocument = HydratedDocument<Article>;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Article {
   @Prop({ type: String, required: true })
   title: string;
@@ -17,11 +17,11 @@ export class Article {
   @Prop({ type: Boolean, default: true })
   isVisible: boolean;
 
-  @Prop({ type: Date, default: Date.now })
-  date: Date;
-
   @Prop({ type: String })
   image: string;
+
+  @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }])
+  comments: Comment[];
 }
 
 export const ArticleSchema = SchemaFactory.createForClass(Article);

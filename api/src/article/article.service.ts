@@ -17,11 +17,11 @@ export class ArticleService {
   }
 
   async findAll(): Promise<Article[]> {
-    return this.articleModel.find().exec();
+    return this.articleModel.find().populate('comments');
   }
 
   async find(id: string): Promise<Article> {
-    return this.articleModel.findById(id).exec();
+    return this.articleModel.findById(id).populate('comments');
   }
 
   async update(

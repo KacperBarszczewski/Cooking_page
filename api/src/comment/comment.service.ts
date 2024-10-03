@@ -7,19 +7,26 @@ import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
 import { Comment, CommentDocument } from './schemas/comment.schema';
 import { User } from '../auth/schemas/user.schema';
+import { Article } from '../article/article.schema';
 
 @Injectable()
 export class CommentService {
   constructor(
-    @InjectModel(Comment.name)
-    private commentModel: Model<Comment>,
+    @InjectModel(Comment.name) private commentModel: Model<Comment>,
+    @InjectModel(Article.name) private articleModel: Model<Article>,
   ) {}
 
   async create(comment: Comment, user: User): Promise<CommentDocument> {
     const data = Object.assign(comment, { user: user._id });
 
     const newComment = new this.commentModel(data);
-    return newComment.save();
+    const savedComment = newComment.save();
+
+    await this.articleModel.findByIdAndUpdate(newComment.article_id, {
+      $push: { comments: newComment._id },
+    });
+
+    return savedComment;
   }
 
   async findAll(): Promise<Comment[]> {
@@ -44,6 +51,14 @@ export class CommentService {
   }
 
   async deleteById(id: string): Promise<Comment> {
-    return await this.commentModel.findByIdAndDelete(id);
+    const deletedComment = await this.commentModel.findByIdAndDelete(id);
+
+    if (!deletedComment) throw new NotFoundException('Comment not found');
+
+    await this.articleModel.findByIdAndUpdate(deletedComment.article_id, {
+      $pull: { comments: id },
+    });
+
+    return deletedComment;
   }
 }
