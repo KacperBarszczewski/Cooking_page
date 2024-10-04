@@ -5,7 +5,7 @@ import { Article, ArticleDocument } from '../article/article.schema';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Comment, CommentDocument } from '../comment/schemas/comment.schema';
-import { User } from '../auth/schemas/user.schema';
+import { User } from '../user/schemas/user.schema';
 import { Role } from '../auth/enums/role.enum';
 
 @Injectable()

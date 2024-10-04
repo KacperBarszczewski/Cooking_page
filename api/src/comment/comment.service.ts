@@ -6,7 +6,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
 import { Comment, CommentDocument } from './schemas/comment.schema';
-import { User } from '../auth/schemas/user.schema';
+import { User } from '../user/schemas/user.schema';
 import { Article } from '../article/article.schema';
 
 @Injectable()

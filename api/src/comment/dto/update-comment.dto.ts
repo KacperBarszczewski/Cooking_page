@@ -1,5 +1,5 @@
 import { IsBoolean, IsEmpty, IsOptional, IsString } from 'class-validator';
-import { User } from '../../auth/schemas/user.schema';
+import { User } from '../../user/schemas/user.schema';
 
 export class UpdateCommentDto {
   @IsOptional()
