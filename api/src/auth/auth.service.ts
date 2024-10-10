@@ -36,9 +36,6 @@ export class AuthService {
   }
 
   async login(userId: string) {
-    // const payload: AuthJwtPayload = { sub: userId };
-    // const token = this.jwtService.sign(payload);
-    // const refreshToken = this.jwtService.sign(payload, this.refreshTokenConfig);
     const { accessToken, refreshToken } = await this.generateTokens(userId);
     const hashedRefreshToken = await argon2.hash(refreshToken);
     await this.userService.updateHashedRefreshToken(userId, hashedRefreshToken);
@@ -64,7 +61,7 @@ export class AuthService {
   }
 
   async validateRefreshToken(userId: string, refreshToken: string) {
-    const user = await this.userService.findById(userId);
+    const user = await this.userService.findByIdWithHashedRefreshToken(userId);
 
     if (!user || !user.hashedRefreshToken)
       throw new UnauthorizedException('Invalid Refrash Token');
@@ -74,7 +71,6 @@ export class AuthService {
       refreshToken,
     );
 
-    console.log(refreshTokenMatches);
     if (!refreshTokenMatches)
       throw new UnauthorizedException('Invalid Refrash Token');
 

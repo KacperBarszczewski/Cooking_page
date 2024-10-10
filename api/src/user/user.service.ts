@@ -29,6 +29,14 @@ export class UserService {
   }
 
   async findById(id: string): Promise<User | null> {
+    const user = await this.userModel.findById(id);
+
+    if (!user) return null;
+
+    return user;
+  }
+
+  async findByIdWithHashedRefreshToken(id: string): Promise<User | null> {
     const user = await this.userModel
       .findById(id)
       .select('+hashedRefreshToken');
