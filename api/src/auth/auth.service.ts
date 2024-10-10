@@ -6,6 +6,7 @@ import { AuthJwtPayload } from './types/auth-jwtPayload';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import refreshJwtConfig from './config/refresh-jwt.config';
 import { ConfigType } from '@nestjs/config';
+import * as argon2 from 'argon2';
 
 @Injectable()
 export class AuthService {
@@ -39,7 +40,7 @@ export class AuthService {
     // const token = this.jwtService.sign(payload);
     // const refreshToken = this.jwtService.sign(payload, this.refreshTokenConfig);
     const { accessToken, refreshToken } = await this.generateTokens(userId);
-    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    const hashedRefreshToken = await argon2.hash(refreshToken);
     await this.userService.updateHashedRefreshToken(userId, hashedRefreshToken);
 
     return { id: userId, accessToken, refreshToken };
@@ -56,7 +57,7 @@ export class AuthService {
 
   async refreshToken(userId: string) {
     const { accessToken, refreshToken } = await this.generateTokens(userId);
-    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    const hashedRefreshToken = await argon2.hash(refreshToken);
     await this.userService.updateHashedRefreshToken(userId, hashedRefreshToken);
 
     return { id: userId, accessToken, refreshToken };
@@ -66,16 +67,16 @@ export class AuthService {
     const user = await this.userService.findById(userId);
 
     if (!user || !user.hashedRefreshToken)
-      throw new UnauthorizedException('Invalid Refrash Token1');
+      throw new UnauthorizedException('Invalid Refrash Token');
 
-    const refreshTokenMatches = await bcrypt.compare(
+    const refreshTokenMatches = await argon2.verify(
+      user.hashedRefreshToken,
       refreshToken,
-      '$2a$10$6xfrA6O/SpG.h1aKOW7wWelIrMrRcgj52WHUBDuZLqOOVMooeJuzG',
     );
 
     console.log(refreshTokenMatches);
     if (!refreshTokenMatches)
-      throw new UnauthorizedException('Invalid Refrash Token2');
+      throw new UnauthorizedException('Invalid Refrash Token');
 
     return { id: userId };
   }
