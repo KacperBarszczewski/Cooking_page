@@ -13,7 +13,7 @@ export class AuthService {
     private userService: UserService,
     private jwtService: JwtService,
     @Inject(refreshJwtConfig.KEY)
-    private refreshTokenConfi: ConfigType<typeof refreshJwtConfig>,
+    private refreshTokenConfig: ConfigType<typeof refreshJwtConfig>,
   ) {}
 
   async singUp(createUserDto: CreateUserDto) {
@@ -34,17 +34,53 @@ export class AuthService {
     return { id: user._id };
   }
 
-  login(userId: string) {
-    const payload: AuthJwtPayload = { sub: userId };
-    const token = this.jwtService.sign(payload);
-    const refreshToken = this.jwtService.sign(payload, this.refreshTokenConfi);
+  async login(userId: string) {
+    // const payload: AuthJwtPayload = { sub: userId };
+    // const token = this.jwtService.sign(payload);
+    // const refreshToken = this.jwtService.sign(payload, this.refreshTokenConfig);
+    const { accessToken, refreshToken } = await this.generateTokens(userId);
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    await this.userService.updateHashedRefreshToken(userId, hashedRefreshToken);
 
-    return { id: userId, token, refreshToken };
+    return { id: userId, accessToken, refreshToken };
   }
 
-  refreshToken(userId: string) {
+  async generateTokens(userId: string) {
     const payload: AuthJwtPayload = { sub: userId };
-    const token = this.jwtService.sign(payload);
-    return { id: userId, token };
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(payload),
+      this.jwtService.signAsync(payload, this.refreshTokenConfig),
+    ]);
+    return { accessToken, refreshToken };
+  }
+
+  async refreshToken(userId: string) {
+    const { accessToken, refreshToken } = await this.generateTokens(userId);
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    await this.userService.updateHashedRefreshToken(userId, hashedRefreshToken);
+
+    return { id: userId, accessToken, refreshToken };
+  }
+
+  async validateRefreshToken(userId: string, refreshToken: string) {
+    const user = await this.userService.findById(userId);
+
+    if (!user || !user.hashedRefreshToken)
+      throw new UnauthorizedException('Invalid Refrash Token1');
+
+    const refreshTokenMatches = await bcrypt.compare(
+      refreshToken,
+      '$2a$10$6xfrA6O/SpG.h1aKOW7wWelIrMrRcgj52WHUBDuZLqOOVMooeJuzG',
+    );
+
+    console.log(refreshTokenMatches);
+    if (!refreshTokenMatches)
+      throw new UnauthorizedException('Invalid Refrash Token2');
+
+    return { id: userId };
+  }
+
+  async singOut(userId: string) {
+    await this.userService.updateHashedRefreshToken(userId, null);
   }
 }

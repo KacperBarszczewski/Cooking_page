@@ -15,6 +15,9 @@ export class User extends Document {
   @Prop({ select: false })
   password: string;
 
+  @Prop({ select: false })
+  hashedRefreshToken: string;
+
   @Prop({ type: [{ type: String, enum: Role }], default: [Role.User] })
   role: Role[];
 }

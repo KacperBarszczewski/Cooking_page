@@ -29,10 +29,18 @@ export class UserService {
   }
 
   async findById(id: string): Promise<User | null> {
-    const user = await this.userModel.findById(id);
+    const user = await this.userModel
+      .findById(id)
+      .select('+hashedRefreshToken');
 
     if (!user) return null;
 
     return user;
+  }
+
+  async updateHashedRefreshToken(userId: string, hashedRefreshToken: string) {
+    return await this.userModel.findByIdAndUpdate(userId, {
+      hashedRefreshToken,
+    });
   }
 }
