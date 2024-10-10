@@ -7,6 +7,7 @@ import { CreateUserDto } from '../user/dto/create-user.dto';
 import refreshJwtConfig from './config/refresh-jwt.config';
 import { ConfigType } from '@nestjs/config';
 import * as argon2 from 'argon2';
+import { CurrentUser } from './types/current-user';
 
 @Injectable()
 export class AuthService {
@@ -75,6 +76,14 @@ export class AuthService {
       throw new UnauthorizedException('Invalid Refrash Token');
 
     return { id: userId };
+  }
+
+  async validateJwtUser(userId: string) {
+    const user = await this.userService.findById(userId);
+    if (!user) throw new UnauthorizedException('User not found');
+
+    const currentUser: CurrentUser = { id: user._id, role: user.role };
+    return currentUser;
   }
 
   async singOut(userId: string) {

@@ -51,4 +51,8 @@ export class UserService {
       hashedRefreshToken,
     });
   }
+
+  async getAll() {
+    return await this.userModel.find();
+  }
 }
