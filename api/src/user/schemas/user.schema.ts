@@ -12,7 +12,7 @@ export class User extends Document {
   @Prop({ unique: [true, 'Duplicate email entered'] })
   email: string;
 
-  @Prop()
+  @Prop({ select: false })
   password: string;
 
   @Prop({ type: [{ type: String, enum: Role }], default: [Role.User] })

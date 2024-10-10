@@ -3,6 +3,7 @@ import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { AuthJwtPayload } from './types/auth-jwtPayload';
+import { CreateUserDto } from '../user/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -11,23 +12,9 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  // async singUp(singUpDto: SignUpDto): Promise<{ token: string }> {
-  //   const { name, email, password } = singUpDto;
-  //   const existingUser = await this.userModel.findOne({ email });
-
-  //   if (existingUser) throw new BadRequestException('Email already in use');
-
-  //   const hashedPassword = await bcrypt.hash(password, 10);
-
-  //   const user = await this.userModel.create({
-  //     name,
-  //     email,
-  //     password: hashedPassword,
-  //   });
-
-  //   const token = this.jwtService.sign({ id: user._id });
-  //   return { token };
-  // }
+  async singUp(createUserDto: CreateUserDto) {
+    return await this.userService.create(createUserDto);
+  }
 
   async validateUser(email: string, password: string): Promise<{ id: string }> {
     const user = await this.userService.findByEmail(email);
