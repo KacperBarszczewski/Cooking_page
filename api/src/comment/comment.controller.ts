@@ -7,16 +7,13 @@ import {
   Post,
   Put,
   Req,
-  UseGuards,
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { Comment } from './schemas/comment.schema';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
-import { RolesGuard } from '../auth/guards/roles.guard';
 
 @Controller('comment')
 export class CommentController {
@@ -24,7 +21,6 @@ export class CommentController {
 
   @Get()
   @Roles(Role.Admin)
-  @UseGuards(AuthGuard(), RolesGuard)
   getAllComments(): Promise<Comment[]> {
     return this.commentService.findAll();
   }
@@ -35,7 +31,6 @@ export class CommentController {
   }
 
   @Post()
-  @UseGuards(AuthGuard())
   createComment(
     @Body() comment: CreateCommentDto,
     @Req() req,
@@ -44,13 +39,13 @@ export class CommentController {
   }
 
   @Put(':id')
-  @UseGuards(AuthGuard())
+  //@UseGuards(AuthGuard())
   updateComment(@Param('id') id: string, @Body() comment: UpdateCommentDto) {
     return this.updateComment(id, comment);
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard())
+  //@UseGuards(AuthGuard())
   deleteComment(@Param('id') id: string): Promise<Comment> {
     return this.commentService.deleteById(id);
   }

@@ -17,7 +17,10 @@ export class ArticleService {
   }
 
   async findAll(): Promise<Article[]> {
-    return this.articleModel.find().populate('comments');
+    return this.articleModel.find().populate({
+      path: 'comments',
+      populate: { path: 'user', select: 'name email role' },
+    });
   }
 
   async find(id: string): Promise<Article> {

@@ -8,6 +8,7 @@ import mongoose, { Model } from 'mongoose';
 import { Comment, CommentDocument } from './schemas/comment.schema';
 import { User } from '../user/schemas/user.schema';
 import { Article } from '../article/article.schema';
+import { CreateCommentDto } from './dto/create-comment.dto';
 
 @Injectable()
 export class CommentService {
@@ -16,7 +17,10 @@ export class CommentService {
     @InjectModel(Article.name) private articleModel: Model<Article>,
   ) {}
 
-  async create(comment: Comment, user: User): Promise<CommentDocument> {
+  async create(
+    comment: CreateCommentDto,
+    user: User,
+  ): Promise<CommentDocument> {
     const data = Object.assign(comment, { user: user._id });
 
     const newComment = new this.commentModel(data);

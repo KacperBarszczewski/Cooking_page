@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { User } from '../../user/schemas/user.schema';
+import { Article } from '../../article/article.schema';
 
 export type CommentDocument = HydratedDocument<Comment>;
 
@@ -14,11 +15,8 @@ export class Comment {
   @Prop()
   text: string;
 
-  @Prop({
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Article',
-  })
-  article_id: string;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Article.name })
+  article_id: Article;
 
   @Prop({ default: true })
   isVisible: boolean;
