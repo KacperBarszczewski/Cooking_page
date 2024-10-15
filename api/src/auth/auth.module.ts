@@ -11,6 +11,9 @@ import { LocalStrategy } from './strategies/local.strategy';
 import jwtConfig from './config/jwt.config';
 import refreshJwtConfig from './config/refresh-jwt.config';
 import { RefreshJwtStrategy } from './strategies/refresh.strategy';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { RolesGuard } from './guards/roles.guard';
 
 @Module({
   imports: [
@@ -27,6 +30,14 @@ import { RefreshJwtStrategy } from './strategies/refresh.strategy';
     LocalStrategy,
     JwtStrategy,
     RefreshJwtStrategy,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
   ],
   exports: [JwtStrategy, PassportModule],
 })

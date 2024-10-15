@@ -13,6 +13,7 @@ import { CreateArticleDto } from './dto/CreateArticle.dto';
 import { CreateArticleValidationPipe } from './pipes/CreateArticleValidation.pipe';
 import { UpdateArticleDto } from './dto/UpdateArticle.dto';
 import { UpdateArticleValidationPipe } from './pipes/UpdateArticleValidation.pipe';
+import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('article')
 export class ArticleController {
@@ -25,11 +26,13 @@ export class ArticleController {
   }
 
   @Get()
+  @Public()
   async findAllArticles() {
     return await this.articleService.findAll();
   }
 
   @Get(':id')
+  @Public()
   async findArticle(@Param('id') id: string) {
     return await this.articleService.find(id);
   }
