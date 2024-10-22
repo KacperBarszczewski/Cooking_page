@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Req,
   UsePipes,
 } from '@nestjs/common';
 import { ArticleService } from './article.service';
@@ -21,8 +22,8 @@ export class ArticleController {
 
   @Post()
   @UsePipes(new CreateArticleValidationPipe())
-  async createPost(@Body() createArticleDto: CreateArticleDto) {
-    return this.articleService.create(createArticleDto);
+  async createPost(@Body() createArticleDto: CreateArticleDto, @Req() req) {
+    return this.articleService.create(createArticleDto, req.user);
   }
 
   @Get()

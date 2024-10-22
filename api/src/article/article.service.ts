@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { Article } from './article.schema';
 import { CreateArticleDto } from './dto/CreateArticle.dto';
 import { UpdateArticleDto } from './dto/UpdateArticle.dto';
+import { CurrentUser } from '../auth/types/current-user';
 
 @Injectable()
 export class ArticleService {
@@ -12,8 +13,13 @@ export class ArticleService {
     private articleModel: Model<Article>,
   ) {}
 
-  async create(createArticleDto: CreateArticleDto): Promise<Article> {
-    return this.articleModel.create(createArticleDto);
+  async create(
+    createArticleDto: CreateArticleDto,
+    user: CurrentUser,
+  ): Promise<Article> {
+    const data = { ...createArticleDto, user: user.id };
+
+    return this.articleModel.create(data);
   }
 
   async findAll(): Promise<Article[]> {

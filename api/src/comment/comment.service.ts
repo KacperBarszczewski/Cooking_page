@@ -6,9 +6,9 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
 import { Comment, CommentDocument } from './schemas/comment.schema';
-import { User } from '../user/schemas/user.schema';
 import { Article } from '../article/article.schema';
 import { CreateCommentDto } from './dto/create-comment.dto';
+import { CurrentUser } from '../auth/types/current-user';
 
 @Injectable()
 export class CommentService {
@@ -19,9 +19,9 @@ export class CommentService {
 
   async create(
     comment: CreateCommentDto,
-    user: User,
+    user: CurrentUser,
   ): Promise<CommentDocument> {
-    const data = Object.assign(comment, { user: user._id });
+    const data = Object.assign(comment, { user: user.id });
 
     const newComment = new this.commentModel(data);
     const savedComment = newComment.save();

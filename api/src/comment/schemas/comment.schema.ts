@@ -15,13 +15,13 @@ export class Comment {
   @Prop()
   text: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Article.name })
-  article_id: Article;
-
   @Prop({ default: true })
   isVisible: boolean;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Article' })
+  article_id: Article;
+
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   user: User;
 }
 
