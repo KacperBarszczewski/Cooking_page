@@ -8,6 +8,7 @@ import refreshJwtConfig from './config/refresh-jwt.config';
 import { ConfigType } from '@nestjs/config';
 import * as argon2 from 'argon2';
 import { CurrentUser } from './types/current-user';
+import { LocalUser } from './types/local-user';
 
 @Injectable()
 export class AuthService {
@@ -22,7 +23,7 @@ export class AuthService {
     return await this.userService.create(createUserDto);
   }
 
-  async validateUser(email: string, password: string): Promise<{ id: string }> {
+  async validateLocalUser(email: string, password: string): Promise<LocalUser> {
     const user = await this.userService.findByEmail(email);
     if (!user) {
       throw new UnauthorizedException('Invalid email or password');
@@ -33,15 +34,20 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    return { id: user._id };
+    return { id: user.id, name: user.name, role: user.role };
   }
 
-  async login(userId: string) {
-    const { accessToken, refreshToken } = await this.generateTokens(userId);
+  async login(localUser: LocalUser) {
+    const { accessToken, refreshToken } = await this.generateTokens(
+      localUser.id,
+    );
     const hashedRefreshToken = await argon2.hash(refreshToken);
-    await this.userService.updateHashedRefreshToken(userId, hashedRefreshToken);
+    await this.userService.updateHashedRefreshToken(
+      localUser.id,
+      hashedRefreshToken,
+    );
 
-    return { id: userId, accessToken, refreshToken };
+    return { ...localUser, accessToken, refreshToken };
   }
 
   async generateTokens(userId: string) {

@@ -14,6 +14,7 @@ import { CreateUserDto } from '../user/dto/create-user.dto';
 import { RefreshAuthGuard } from './guards/refresh-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { Public } from './decorators/public.decorator';
+import { LocalUser } from './types/local-user';
 
 @Controller('auth')
 export class AuthController {
@@ -30,8 +31,9 @@ export class AuthController {
   @Public()
   @UseGuards(LocalAuthGuard)
   @HttpCode(HttpStatus.OK)
-  login(@Request() req) {
-    return this.authService.login(req.user.id);
+  login(@Request() req: { user: LocalUser }) {
+    console.log(req);
+    return this.authService.login(req.user);
   }
 
   @Post('refresh')
