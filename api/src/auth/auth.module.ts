@@ -13,7 +13,8 @@ import { RefreshJwtStrategy } from './strategies/refresh.strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
-import { UserModule } from 'src/user/user.module';
+import { UserModule } from '../user/user.module';
+import { AuthValidationService } from './auth-validation.service';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { UserModule } from 'src/user/user.module';
   controllers: [AuthController],
   providers: [
     AuthService,
+    AuthValidationService,
     UserService,
     LocalStrategy,
     JwtStrategy,

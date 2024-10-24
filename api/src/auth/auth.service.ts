@@ -1,5 +1,4 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
-import * as bcrypt from 'bcryptjs';
+import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { AuthJwtPayload } from './types/auth-jwtPayload';
@@ -9,6 +8,7 @@ import { ConfigType } from '@nestjs/config';
 import * as argon2 from 'argon2';
 import { CurrentUser } from './types/current-user';
 import { LocalUser } from './types/local-user';
+import { AuthValidationService } from './auth-validation.service';
 
 @Injectable()
 export class AuthService {
@@ -17,40 +17,43 @@ export class AuthService {
     private jwtService: JwtService,
     @Inject(refreshJwtConfig.KEY)
     private refreshTokenConfig: ConfigType<typeof refreshJwtConfig>,
+    private authValidationService: AuthValidationService,
   ) {}
 
-  async singUp(createUserDto: CreateUserDto) {
-    return await this.userService.create(createUserDto);
-  }
-
-  async validateLocalUser(email: string, password: string): Promise<LocalUser> {
-    const user = await this.userService.findByEmail(email);
-    if (!user) {
-      throw new UnauthorizedException('Invalid email or password');
-    }
-
-    const isPasswordMatched = await bcrypt.compare(password, user.password);
-    if (!isPasswordMatched) {
-      throw new UnauthorizedException('Invalid email or password');
-    }
-
-    return { id: user.id, name: user.name, role: user.role };
+  async register(createUserDto: CreateUserDto) {
+    return this.userService.create(createUserDto);
   }
 
   async login(localUser: LocalUser) {
-    const { accessToken, refreshToken } = await this.generateTokens(
-      localUser.id,
-    );
-    const hashedRefreshToken = await argon2.hash(refreshToken);
-    await this.userService.updateHashedRefreshToken(
-      localUser.id,
-      hashedRefreshToken,
-    );
-
-    return { ...localUser, accessToken, refreshToken };
+    const tokens = await this.generateAndStoreTokens(localUser.id);
+    return { ...localUser, ...tokens };
   }
 
-  async generateTokens(userId: string) {
+  async logout(userId: string) {
+    return this.userService.updateHashedRefreshToken(userId, null);
+  }
+
+  async refreshToken(userId: string) {
+    const tokens = await this.generateAndStoreTokens(userId);
+    return { id: userId, ...tokens };
+  }
+
+  async validateLocalUser(email: string, password: string): Promise<LocalUser> {
+    return this.authValidationService.validateLocalUser(email, password);
+  }
+
+  async validateJwtUser(userId: string): Promise<CurrentUser> {
+    return this.authValidationService.validateJwtUser(userId);
+  }
+
+  async validateRefreshToken(userId: string, refreshToken: string) {
+    return this.authValidationService.validateRefreshToken(
+      userId,
+      refreshToken,
+    );
+  }
+
+  private async generateTokens(userId: string) {
     const payload: AuthJwtPayload = { sub: userId };
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload),
@@ -59,39 +62,11 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  async refreshToken(userId: string) {
+  private async generateAndStoreTokens(userId: string) {
     const { accessToken, refreshToken } = await this.generateTokens(userId);
     const hashedRefreshToken = await argon2.hash(refreshToken);
+
     await this.userService.updateHashedRefreshToken(userId, hashedRefreshToken);
-
-    return { id: userId, accessToken, refreshToken };
-  }
-
-  async validateRefreshToken(userId: string, refreshToken: string) {
-    const user = await this.userService.findByIdWithHashedRefreshToken(userId);
-
-    if (!user || !user.hashedRefreshToken)
-      throw new UnauthorizedException('Invalid Refrash Token');
-
-    const refreshTokenMatches = await argon2.verify(
-      user.hashedRefreshToken,
-      refreshToken,
-    );
-
-    if (!refreshTokenMatches)
-      throw new UnauthorizedException('Invalid Refrash Token');
-
-    return { id: userId };
-  }
-
-  async validateJwtUser(userId: string): Promise<CurrentUser> {
-    const user = await this.userService.findById(userId);
-    if (!user) throw new UnauthorizedException('User not found');
-
-    return { id: user._id, role: user.role };
-  }
-
-  async singOut(userId: string) {
-    await this.userService.updateHashedRefreshToken(userId, null);
+    return { accessToken, refreshToken };
   }
 }

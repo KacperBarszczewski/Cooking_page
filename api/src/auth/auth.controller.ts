@@ -21,10 +21,15 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Public()
-  @Post('signup')
-  async signUp(@Body() createUserDto: CreateUserDto) {
-    const user = await this.authService.singUp(createUserDto);
-    return this.authService.login(user._id);
+  @Post('register')
+  async register(@Body() createUserDto: CreateUserDto) {
+    const user = await this.authService.register(createUserDto);
+    const localUser: LocalUser = {
+      id: user._id,
+      name: user.name,
+      role: user.role,
+    };
+    return this.authService.login(localUser);
   }
 
   @Post('login')
@@ -42,9 +47,9 @@ export class AuthController {
     return this.authService.refreshToken(req.user.id);
   }
 
-  @Post('signout')
+  @Post('logout')
   @UseGuards(JwtAuthGuard)
-  singOut(@Req() req) {
-    this.authService.singOut(req.user.id);
+  logout(@Req() req) {
+    this.authService.logout(req.user.id);
   }
 }
