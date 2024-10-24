@@ -32,11 +32,11 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @HttpCode(HttpStatus.OK)
   login(@Request() req: { user: LocalUser }) {
-    console.log(req);
     return this.authService.login(req.user);
   }
 
   @Post('refresh')
+  @Public()
   @UseGuards(RefreshAuthGuard)
   refreshToken(@Req() req) {
     return this.authService.refreshToken(req.user.id);
