@@ -84,12 +84,11 @@ export class AuthService {
     return { id: userId };
   }
 
-  async validateJwtUser(userId: string) {
+  async validateJwtUser(userId: string): Promise<CurrentUser> {
     const user = await this.userService.findById(userId);
     if (!user) throw new UnauthorizedException('User not found');
 
-    const currentUser: CurrentUser = { id: user._id, role: user.role };
-    return currentUser;
+    return { id: user._id, role: user.role };
   }
 
   async singOut(userId: string) {
