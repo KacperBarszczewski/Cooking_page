@@ -29,17 +29,18 @@ export class AuthValidationService {
   }
 
   async validateRefreshToken(userId: string, refreshToken: string) {
-    const user = await this.userService.findByIdWithHashedRefreshToken(userId);
+    const user = await this.userService.findByIdWithRefreshTokenList(userId);
 
-    if (!user || !user.hashedRefreshToken)
+    if (!user || !user.refreshTokenList)
       throw new UnauthorizedException('Invalid Refresh Token');
 
-    const refreshTokenMatches = await argon2.verify(
-      user.hashedRefreshToken,
-      refreshToken,
+    const refreshTokenMatches = await Promise.all(
+      user.refreshTokenList.map(async (tokenData) => {
+        return await argon2.verify(tokenData.hashedRefreshToken, refreshToken);
+      }),
     );
 
-    if (!refreshTokenMatches)
+    if (!refreshTokenMatches.includes(true))
       throw new UnauthorizedException('Invalid Refresh Token');
 
     return { id: userId };

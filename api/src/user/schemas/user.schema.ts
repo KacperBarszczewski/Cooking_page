@@ -2,6 +2,12 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { Role } from '../../auth/enums/role.enum';
 
+export interface RefreshTokenData {
+  deviceInfo: string;
+  ipAddress: string;
+  hashedRefreshToken: string;
+}
+
 @Schema({
   timestamps: true,
 })
@@ -16,7 +22,7 @@ export class User extends Document {
   password: string;
 
   @Prop({ select: false })
-  hashedRefreshToken: string;
+  refreshTokenList: RefreshTokenData[];
 
   @Prop({ type: [{ type: String, enum: Role }], default: [Role.User] })
   role: Role[];

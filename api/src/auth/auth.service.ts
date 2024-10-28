@@ -24,17 +24,25 @@ export class AuthService {
     return this.userService.create(createUserDto);
   }
 
-  async login(localUser: LocalUser) {
-    const tokens = await this.generateAndStoreTokens(localUser.id);
+  async login(localUser: LocalUser, deviceInfo: string, ipAddress: string) {
+    const tokens = await this.generateAndStoreTokens(
+      localUser.id,
+      deviceInfo,
+      ipAddress,
+    );
     return { ...localUser, ...tokens };
   }
 
-  async logout(userId: string) {
-    return this.userService.updateHashedRefreshToken(userId, null);
+  async logout(userId: string, refreshToken: string) {
+    return this.userService.removeRefreshToken(userId, refreshToken);
   }
 
-  async refreshToken(userId: string) {
-    const tokens = await this.generateAndStoreTokens(userId);
+  async refreshToken(userId: string, deviceInfo: string, ipAddress: string) {
+    const tokens = await this.generateAndStoreTokens(
+      userId,
+      deviceInfo,
+      ipAddress,
+    );
     return { id: userId, ...tokens };
   }
 
@@ -62,11 +70,20 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  private async generateAndStoreTokens(userId: string) {
+  private async generateAndStoreTokens(
+    userId: string,
+    deviceInfo: string,
+    ipAddress: string,
+  ) {
     const { accessToken, refreshToken } = await this.generateTokens(userId);
     const hashedRefreshToken = await argon2.hash(refreshToken);
 
-    await this.userService.updateHashedRefreshToken(userId, hashedRefreshToken);
+    await this.userService.updateHashedRefreshToken(
+      userId,
+      hashedRefreshToken,
+      deviceInfo,
+      ipAddress,
+    );
     return { accessToken, refreshToken };
   }
 }
