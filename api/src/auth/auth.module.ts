@@ -15,6 +15,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { UserModule } from '../user/user.module';
 import { AuthValidationService } from './auth-validation.service';
+import { RefreshTokenModule } from '../refresh-token/refresh-token.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AuthValidationService } from './auth-validation.service';
     ConfigModule.forFeature(jwtConfig),
     ConfigModule.forFeature(refreshJwtConfig),
     UserModule,
+    RefreshTokenModule,
   ],
   controllers: [AuthController],
   providers: [

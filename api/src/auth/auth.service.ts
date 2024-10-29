@@ -9,6 +9,8 @@ import * as argon2 from 'argon2';
 import { CurrentUser } from './types/current-user';
 import { LocalUser } from './types/local-user';
 import { AuthValidationService } from './auth-validation.service';
+import { RefreshTokenService } from '../refresh-token/refresh-token.service';
+import { CreateRefreshTokenDto } from '../refresh-token/dto/create-refresh-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +20,7 @@ export class AuthService {
     @Inject(refreshJwtConfig.KEY)
     private refreshTokenConfig: ConfigType<typeof refreshJwtConfig>,
     private authValidationService: AuthValidationService,
+    private refreshTokenService: RefreshTokenService,
   ) {}
 
   async register(createUserDto: CreateUserDto) {
@@ -77,13 +80,14 @@ export class AuthService {
   ) {
     const { accessToken, refreshToken } = await this.generateTokens(userId);
     const hashedRefreshToken = await argon2.hash(refreshToken);
-
-    await this.userService.updateHashedRefreshToken(
-      userId,
-      hashedRefreshToken,
+    const createRefreshTokenDto: CreateRefreshTokenDto = {
       deviceInfo,
       ipAddress,
-    );
+      hashedRefreshToken,
+      user: userId,
+    };
+
+    await this.refreshTokenService.create(createRefreshTokenDto);
     return { accessToken, refreshToken };
   }
 }

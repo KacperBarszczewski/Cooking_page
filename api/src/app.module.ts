@@ -8,6 +8,7 @@ import { CommentModule } from './comment/comment.module';
 import { SeederModule } from './seeders/seeder.module';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
+import { RefreshTokenModule } from './refresh-token/refresh-token.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { UserModule } from './user/user.module';
     }),
     MongooseModule.forRoot(process.env.MONGO_URL),
     UserModule,
+    RefreshTokenModule,
     AuthModule,
     ArticleModule,
     CommentModule,
