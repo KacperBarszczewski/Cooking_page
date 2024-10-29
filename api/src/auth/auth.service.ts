@@ -40,12 +40,8 @@ export class AuthService {
     return this.refreshTokenService.delete(userId, refreshToken);
   }
 
-  async refreshToken(userId: string, deviceInfo: string, ipAddress: string) {
-    const tokens = await this.generateAndStoreTokens(
-      userId,
-      deviceInfo,
-      ipAddress,
-    );
+  async refreshToken(userId: string, refreshToken: string) {
+    const tokens = await this.generateAndUpdateTokens(userId, refreshToken);
     return { id: userId, ...tokens };
   }
 
@@ -88,6 +84,21 @@ export class AuthService {
     };
 
     await this.refreshTokenService.create(createRefreshTokenDto);
+    return { accessToken, refreshToken };
+  }
+
+  private async generateAndUpdateTokens(
+    userId: string,
+    oldRefreshToken: string,
+  ) {
+    const { accessToken, refreshToken } = await this.generateTokens(userId);
+    const newhashedRefreshToken = await argon2.hash(refreshToken);
+
+    await this.refreshTokenService.updateHashedRefreshToken(
+      userId,
+      oldRefreshToken,
+      newhashedRefreshToken,
+    );
     return { accessToken, refreshToken };
   }
 }

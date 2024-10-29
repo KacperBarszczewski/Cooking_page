@@ -38,6 +38,21 @@ export class RefreshTokenService {
     }
   }
 
+  async updateHashedRefreshToken(
+    userId: string,
+    oldRefreshToken: string,
+    newhashedRefreshToken: string,
+  ) {
+    const refreshTokenId = await this.findByUserIdAndRefreshToken(
+      userId,
+      oldRefreshToken,
+    );
+
+    return this.refreshTokenModel.findByIdAndUpdate(refreshTokenId, {
+      hashedRefreshToken: newhashedRefreshToken,
+    });
+  }
+
   async delete(userId: string, refreshToken: string) {
     const refreshTokenId = await this.findByUserIdAndRefreshToken(
       userId,

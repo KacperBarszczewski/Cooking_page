@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Get,
   HttpCode,
   HttpStatus,
   Post,
@@ -48,9 +47,8 @@ export class AuthController {
   @Public()
   @UseGuards(RefreshAuthGuard)
   refreshToken(@Req() req) {
-    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    const userAgent = req.headers['user-agent'];
-    return this.authService.refreshToken(req.user.id, userAgent, ip);
+    const refreshToken = req.get('authorization').replace('Bearer', '').trim();
+    return this.authService.refreshToken(req.user.id, refreshToken);
   }
 
   @Post('logout')
@@ -59,13 +57,5 @@ export class AuthController {
   logout(@Req() req) {
     const refreshToken = req.get('authorization').replace('Bearer', '').trim();
     this.authService.logout(req.user.id, refreshToken);
-  }
-
-  @Get('deviceInfo')
-  @Public()
-  getDeviceInfo(@Req() req): { ip: string; userAgent: string } {
-    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    const userAgent = req.headers['user-agent'];
-    return { ip, userAgent };
   }
 }
