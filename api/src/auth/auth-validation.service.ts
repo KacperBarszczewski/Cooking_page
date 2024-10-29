@@ -1,11 +1,14 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcryptjs';
-import * as argon2 from 'argon2';
+import { RefreshTokenService } from '../refresh-token/refresh-token.service';
 
 @Injectable()
 export class AuthValidationService {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private refreshTokenService: RefreshTokenService,
+  ) {}
 
   async validateLocalUser(email: string, password: string) {
     const user = await this.userService.findByEmail(email);
@@ -29,18 +32,13 @@ export class AuthValidationService {
   }
 
   async validateRefreshToken(userId: string, refreshToken: string) {
-    const user = await this.userService.findByIdWithRefreshTokenList(userId);
+    const refreshTokenId =
+      await this.refreshTokenService.findByUserIdAndRefreshToken(
+        userId,
+        refreshToken,
+      );
 
-    if (!user || !user.refreshTokenList)
-      throw new UnauthorizedException('Invalid Refresh Token');
-
-    const refreshTokenMatches = await Promise.all(
-      user.refreshTokenList.map(async (tokenData) => {
-        return await argon2.verify(tokenData.hashedRefreshToken, refreshToken);
-      }),
-    );
-
-    if (!refreshTokenMatches.includes(true))
+    if (!refreshTokenId)
       throw new UnauthorizedException('Invalid Refresh Token');
 
     return { id: userId };

@@ -37,7 +37,7 @@ export class AuthService {
   }
 
   async logout(userId: string, refreshToken: string) {
-    return this.userService.removeRefreshToken(userId, refreshToken);
+    return this.refreshTokenService.delete(userId, refreshToken);
   }
 
   async refreshToken(userId: string, deviceInfo: string, ipAddress: string) {
