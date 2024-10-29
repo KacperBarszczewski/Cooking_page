@@ -1,7 +1,19 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Req } from '@nestjs/common';
 import { RefreshTokenService } from './refresh-token.service';
 
 @Controller('refresh-token')
 export class RefreshTokenController {
   constructor(private readonly refreshTokenService: RefreshTokenService) {}
+
+  @Get('All')
+  getAll(@Req() req) {
+    return this.refreshTokenService.findByUserIdWithOutHashedRefreshToken(
+      req.user.id,
+    );
+  }
+
+  @Delete(':id')
+  deleteById(@Param('id') id: string, @Req() req) {
+    return this.refreshTokenService.deleteByIdAndUserId(id, req.user.id);
+  }
 }

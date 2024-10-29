@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { RefreshTokenData } from './schemas/refresh-token.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -73,5 +73,16 @@ export class RefreshTokenService {
 
   async deleteAllByUserId(userId: string) {
     return this.refreshTokenModel.deleteMany({ user: userId });
+  }
+
+  async deleteByIdAndUserId(refreshTokenId: string, userId: string) {
+    const refreshToken = await this.refreshTokenModel.findOneAndDelete({
+      user: userId,
+      _id: refreshTokenId,
+    });
+
+    if (!refreshToken) throw new NotFoundException('Not Found');
+
+    return { message: 'Token successfully deleted' };
   }
 }
