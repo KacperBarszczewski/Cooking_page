@@ -40,6 +40,10 @@ export class AuthService {
     return this.refreshTokenService.delete(userId, refreshToken);
   }
 
+  async logoutAllTokens(userId: string) {
+    return this.refreshTokenService.deleteAllByUserId(userId);
+  }
+
   async refreshToken(userId: string, refreshToken: string) {
     const tokens = await this.generateAndUpdateTokens(userId, refreshToken);
     return { id: userId, ...tokens };

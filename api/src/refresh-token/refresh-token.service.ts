@@ -61,4 +61,8 @@ export class RefreshTokenService {
 
     return this.refreshTokenModel.findByIdAndDelete(refreshTokenId);
   }
+
+  async deleteAllByUserId(userId: string) {
+    return this.refreshTokenModel.deleteMany({ user: userId });
+  }
 }

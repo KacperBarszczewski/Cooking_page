@@ -54,8 +54,15 @@ export class AuthController {
   @Post('logout')
   @Public()
   @UseGuards(RefreshAuthGuard)
+  @HttpCode(HttpStatus.OK)
   logout(@Req() req) {
     const refreshToken = req.get('authorization').replace('Bearer', '').trim();
     this.authService.logout(req.user.id, refreshToken);
+  }
+
+  @Post('logoutFromAllDevices')
+  @HttpCode(HttpStatus.OK)
+  logoutFromAllDevices(@Req() req) {
+    this.authService.logoutAllTokens(req.user.id);
   }
 }
