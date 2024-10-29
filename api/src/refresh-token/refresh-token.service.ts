@@ -24,6 +24,15 @@ export class RefreshTokenService {
     return refreshTokenList;
   }
 
+  async findByUserIdWithOutHashedRefreshToken(userId: string) {
+    const refreshTokenList = await this.refreshTokenModel
+      .find({
+        user: userId,
+      })
+      .select('-hashedRefreshToken');
+    return refreshTokenList;
+  }
+
   async findByUserIdAndRefreshToken(userId: string, refreshToken: string) {
     const refreshTokenDataList = await this.findByUserId(userId);
 
