@@ -18,8 +18,9 @@ export class ArticleService {
     user: CurrentUser,
   ): Promise<Article> {
     const data = { ...createArticleDto, user: user.id };
+    const newArticle = await this.articleModel.create(data);
 
-    return this.articleModel.create(data);
+    return newArticle.populate('user', 'name email role');
   }
 
   async findAll(): Promise<Article[]> {
@@ -30,7 +31,10 @@ export class ArticleService {
   }
 
   async find(id: string): Promise<Article> {
-    return this.articleModel.findById(id).populate('comments');
+    return this.articleModel.findById(id).populate({
+      path: 'comments',
+      populate: { path: 'user', select: 'name email role' },
+    });
   }
 
   async update(
@@ -46,5 +50,17 @@ export class ArticleService {
 
   async delete(id: string) {
     return this.articleModel.findByIdAndDelete(id).exec();
+  }
+
+  async addCommentIdByArticleID(articleId: string, commentId: string) {
+    return await this.articleModel.findByIdAndUpdate(articleId, {
+      $push: { comments: commentId },
+    });
+  }
+
+  async deleteCommentIdByArticleID(articleId: string, commentId: string) {
+    return await this.articleModel.findByIdAndUpdate(articleId, {
+      $pull: { comments: commentId },
+    });
   }
 }

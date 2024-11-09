@@ -6,15 +6,15 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
 import { Comment, CommentDocument } from './schemas/comment.schema';
-import { Article } from '../article/article.schema';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CurrentUser } from '../auth/types/current-user';
+import { ArticleService } from 'src/article/article.service';
 
 @Injectable()
 export class CommentService {
   constructor(
     @InjectModel(Comment.name) private commentModel: Model<Comment>,
-    @InjectModel(Article.name) private articleModel: Model<Article>,
+    private articleService: ArticleService,
   ) {}
 
   async create(
@@ -24,11 +24,12 @@ export class CommentService {
     const data = Object.assign(comment, { user: user.id });
 
     const newComment = new this.commentModel(data);
-    const savedComment = newComment.save();
+    const savedComment = await newComment.save();
 
-    await this.articleModel.findByIdAndUpdate(newComment.article_id, {
-      $push: { comments: newComment._id },
-    });
+    this.articleService.addCommentIdByArticleID(
+      comment.article_id,
+      savedComment.id,
+    );
 
     return savedComment;
   }
@@ -59,9 +60,10 @@ export class CommentService {
 
     if (!deletedComment) throw new NotFoundException('Comment not found');
 
-    await this.articleModel.findByIdAndUpdate(deletedComment.article_id, {
-      $pull: { comments: id },
-    });
+    this.articleService.deleteCommentIdByArticleID(
+      deletedComment.article_id.toString(),
+      id,
+    );
 
     return deletedComment;
   }
