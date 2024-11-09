@@ -10,9 +10,6 @@ export type CommentDocument = HydratedDocument<Comment>;
 })
 export class Comment {
   @Prop()
-  name: string;
-
-  @Prop()
   text: string;
 
   @Prop({ default: true })

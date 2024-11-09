@@ -5,7 +5,7 @@ import { RefreshTokenService } from './refresh-token.service';
 export class RefreshTokenController {
   constructor(private readonly refreshTokenService: RefreshTokenService) {}
 
-  @Get('All')
+  @Get('AllUserToken')
   getAll(@Req() req) {
     return this.refreshTokenService.findByUserIdWithOutHashedRefreshToken(
       req.user.id,
