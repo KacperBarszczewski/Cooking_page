@@ -1,8 +1,9 @@
 {
 	"info": {
-		"_postman_id": "e81f4841-ad07-44c2-bcf2-f2ece9f084b0",
+		"_postman_id": "9d817da7-6653-42d7-9895-f0835b70d6c0",
 		"name": "Strona z przepisami",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26037618"
 	},
 	"item": [
 		{
@@ -11,11 +12,21 @@
 				{
 					"name": "http://localhost:3000/article",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"title\": \"Pierogi\",\r\n    \"description\": \"Zrobić pierogi\",\r\n    \"ingredients\": [\r\n        \"jajka\",\r\n        \"mleko\"\r\n    ]\r\n}",
+							"raw": "{\r\n    \"title\": \"ll\",\r\n    \"description\": \"ll\",\r\n    \"ingredients\": [\r\n        \"jajka\",\r\n        \"mleko\"\r\n    ],\r\n    \"image\": \"test-image.jpg\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -40,6 +51,16 @@
 				{
 					"name": "http://localhost:3000/api/article",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
@@ -63,7 +84,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/api/article/6395f7f4c141778d954f4f74",
+							"raw": "http://localhost:3000/api/article/66fc3f89505883686a7eb44f",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -72,7 +93,7 @@
 							"path": [
 								"api",
 								"article",
-								"6395f7f4c141778d954f4f74"
+								"66fc3f89505883686a7eb44f"
 							]
 						}
 					},
@@ -85,7 +106,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"ingredients\": [\r\n        \"jajka\",\r\n        \"mleko\",\r\n        \"kaczka\"\r\n    ]\r\n}",
+							"raw": "{\r\n    \"ingredients\": [\r\n        \"jajka\",\r\n        \"test\",\r\n        \"kk\",\r\n        []\r\n    ],\r\n    \"kk\":\"ll\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -93,7 +114,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/article/6395f7f4c141778d954f4f74",
+							"raw": "http://localhost:3000/api/article/66d0e53674e089063b00bbf1",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -102,7 +123,7 @@
 							"path": [
 								"api",
 								"article",
-								"6395f7f4c141778d954f4f74"
+								"66d0e53674e089063b00bbf1"
 							]
 						}
 					},
@@ -114,7 +135,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/api/article/63961a46172ac4e33b6cfd06",
+							"raw": "http://localhost:3000/api/article/66d0ec1de03c66e2ffbd8b33",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -123,7 +144,7 @@
 							"path": [
 								"api",
 								"article",
-								"63961a46172ac4e33b6cfd06"
+								"66d0ec1de03c66e2ffbd8b33"
 							]
 						}
 					},
@@ -135,13 +156,37 @@
 			"name": "auth",
 			"item": [
 				{
-					"name": "http://localhost:3000/api/auth/register",
+					"name": "register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check for accessToken\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('accessToken');\r",
+									"    var accessToken = jsonData.accessToken;\r",
+									"    pm.collectionVariables.set(\"accessToken\", accessToken);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check for refreshToken\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('refreshToken');\r",
+									"    var refreshToken = jsonData.refreshToken;\r",
+									"    pm.collectionVariables.set(\"refreshToken\", refreshToken);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\":\"root\",\r\n    \"email\":\"root@root.com\",\r\n    \"password\":\"root\"\r\n}",
+							"raw": "{\r\n    \"name\":\"kacper\",\r\n    \"email\":\"kacper4@kacper.com\",\r\n    \"password\":\"123456\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -165,13 +210,178 @@
 					"response": []
 				},
 				{
-					"name": "http://localhost:3000/api/auth/login",
+					"name": "login admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check for accessToken\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('accessToken');\r",
+									"    var accessToken = jsonData.accessToken;\r",
+									"    pm.collectionVariables.set(\"accessToken\", accessToken);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check for refreshToken\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('refreshToken');\r",
+									"    var refreshToken = jsonData.refreshToken;\r",
+									"    pm.collectionVariables.set(\"refreshToken\", refreshToken);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\":\"jon@test7.com\",\r\n    \"password\":\"password\"\r\n}",
+							"raw": "{\r\n    \"email\":\"root@root.com\",\r\n    \"password\":\"root\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "This endpoint allows users to log in and obtain access tokens for future use. The HTTP POST request should be made to [http://localhost:3000/api/auth/login](http://localhost:3000/api/auth/login) with the following payload in the raw request body type:\n\n``` json\n{\n    \"email\": \"root@root.com\",\n    \"password\": \"root\"\n}\n\n ```\n\nUpon successful execution, the response will have a status code of 200 and a Content-Type of application/json. The response body will contain an empty \"id\", \"name\", and \"role\" fields, along with \"accessToken\" and \"refreshToken\" values. The \"accessToken\" should be stored for future use as per the user's requirement."
+					},
+					"response": []
+				},
+				{
+					"name": "refreshToken",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check for accessToken\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('accessToken');\r",
+									"    var accessToken = jsonData.accessToken;\r",
+									"    pm.collectionVariables.set(\"accessToken\", accessToken);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check for refreshToken\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('refreshToken');\r",
+									"    var refreshToken = jsonData.refreshToken;\r",
+									"    pm.collectionVariables.set(\"refreshToken\", refreshToken);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{refreshToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/auth/refresh",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{refreshToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/auth/logout",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check for accessToken\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('accessToken');\r",
+									"    var accessToken = jsonData.accessToken;\r",
+									"    pm.collectionVariables.set(\"accessToken\", accessToken);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check for refreshToken\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('refreshToken');\r",
+									"    var refreshToken = jsonData.refreshToken;\r",
+									"    pm.collectionVariables.set(\"refreshToken\", refreshToken);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"kacper@kacper.com\",\r\n    \"password\":\"123456\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -195,21 +405,22 @@
 					"response": []
 				},
 				{
-					"name": "http://localhost:3000/api/auth/verify-jwt",
+					"name": "logoutAll",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"jwt\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjM5OTQ2MDNkZjVhNWFjNjc0NjFkMjU2IiwibmFtZSI6IkpvbiIsImVtYWlsIjoiam9uQHRlc3Q3LmNvbSIsImlzQWRtaW4iOmZhbHNlfSwiaWF0IjoxNjcxMDM1MTE5LCJleHAiOjE2NzEwMzg3MTl9.5X9J_dqRS6ym734UHuOpjH5uiWkeRYY-YrHZeMaxQIw\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
-							"raw": "http://localhost:3000/api/auth/verify-jwt",
+							"raw": "http://localhost:3000/api/auth/logoutFromAllDevices",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -218,7 +429,7 @@
 							"path": [
 								"api",
 								"auth",
-								"verify-jwt"
+								"logoutFromAllDevices"
 							]
 						}
 					},
@@ -230,12 +441,22 @@
 			"name": "user",
 			"item": [
 				{
-					"name": "http://localhost:3000/api/user/6399445fb3a512c45496f4a6",
+					"name": "profile",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/api/user/639a4e82c8038b3089a8e80b",
+							"raw": "http://localhost:3000/api/user/profile",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -244,7 +465,38 @@
 							"path": [
 								"api",
 								"user",
-								"639a4e82c8038b3089a8e80b"
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "All",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/user/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"user",
+								""
 							]
 						}
 					},
@@ -258,11 +510,21 @@
 				{
 					"name": "http://localhost:3000/api/comment",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NmZjMTc3ZDYyNGE0NjQ5Yjk4ZjY0ZjIiLCJpYXQiOjE3MjkxODA4NjEsImV4cCI6MTcyOTE4MDg5MX0.LQ42ZHJoK2lR3lPSpeP47gP34-L22mACMxSRZoMgWas",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Kacper\",\r\n    \"text\": \"test\",\r\n    \"article_id\":\"6395eabef87ad0d0125a80e1\"\r\n\r\n}",
+							"raw": "{\r\n    \"name\": \"Kacper\",\r\n    \"text\": \"testkk\",\r\n    \"article_id\":\"66fc3f89505883686a7eb44f\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -290,6 +552,16 @@
 						"disableBodyPruning": true
 					},
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -302,7 +574,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/comment/6395eabef87ad0d0125a80e1",
+							"raw": "http://localhost:3000/api/comment/66fee2d10071ec6f38118401",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -311,7 +583,7 @@
 							"path": [
 								"api",
 								"comment",
-								"6395eabef87ad0d0125a80e1"
+								"66fee2d10071ec6f38118401"
 							]
 						}
 					},
@@ -320,6 +592,16 @@
 				{
 					"name": "http://localhost:3000/api/comment",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
@@ -336,8 +618,140 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/comment/671134d5dd6db3571f5edc3c",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"comment",
+								"671134d5dd6db3571f5edc3c"
+							]
+						}
+					},
+					"response": []
 				}
 			]
+		},
+		{
+			"name": "refresh-token",
+			"item": [
+				{
+					"name": "AllUserToken",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/refresh-token/AllUserToken",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"refresh-token",
+								"AllUserToken"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/refresh-token/6721607e4aef8b053ed2adb5",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"refresh-token",
+								"6721607e4aef8b053ed2adb5"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "accessToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refreshToken",
+			"value": "",
+			"type": "string"
 		}
 	]
 }
