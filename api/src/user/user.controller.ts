@@ -1,16 +1,20 @@
-import { Controller } from '@nestjs/common';
-import { Get, Param } from '@nestjs/common/decorators';
-import { UserDetails } from './user-details.interface';
+import { Controller, Get, Req } from '@nestjs/common';
 import { UserService } from './user.service';
+import { Role } from '../auth/enums/role.enum';
+import { Roles } from '../auth/decorators/roles.decorator';
 
 @Controller('user')
 export class UserController {
-    constructor(private userService: UserService){}
+  constructor(private readonly userService: UserService) {}
 
-    @Get(':id')
-    getUser(@Param('id') id: string): Promise<UserDetails | null> {
-        return this.userService.findById(id);
-    }
+  @Get('profile')
+  getProfile(@Req() req) {
+    return this.userService.findById(req.user.id);
+  }
 
-
+  @Get()
+  @Roles(Role.Admin)
+  getAllUsers() {
+    return this.userService.getAll();
+  }
 }

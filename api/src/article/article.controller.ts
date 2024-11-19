@@ -1,49 +1,54 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
-import { ArticleDocument } from './article.schema';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Req,
+  UsePipes,
+} from '@nestjs/common';
 import { ArticleService } from './article.service';
-import { Date } from 'mongoose';
+import { CreateArticleDto } from './dto/CreateArticle.dto';
+import { CreateArticleValidationPipe } from './pipes/CreateArticleValidation.pipe';
+import { UpdateArticleDto } from './dto/UpdateArticle.dto';
+import { UpdateArticleValidationPipe } from './pipes/UpdateArticleValidation.pipe';
+import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('article')
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
   @Post()
-  createPost(
-    @Body('title') title: string,
-    @Body('description') description: string,
-    @Body('ingredients') ingredients: string[],
-    @Body('isVisible') isVisible: boolean,
-    @Body('image') image: string
-  ): Promise<ArticleDocument>{
-    return this.articleService.create(title, description, ingredients, isVisible, image);
+  @UsePipes(new CreateArticleValidationPipe())
+  async createPost(@Body() createArticleDto: CreateArticleDto, @Req() req) {
+    return this.articleService.create(createArticleDto, req.user);
   }
 
   @Get()
-  findAllArticles(): Promise<ArticleDocument[]>{
-    return this.articleService.findAll();
+  @Public()
+  async findAllArticles() {
+    return await this.articleService.findAll();
   }
 
   @Get(':id')
-  findArticle(@Param('id') id:string): Promise<ArticleDocument>{
-    return this.articleService.find(id);
+  @Public()
+  async findArticle(@Param('id') id: string) {
+    return await this.articleService.find(id);
   }
 
   @Patch(':id')
-  updateArticle(
-    @Param('id') id:string,
-    @Body('title') title: string,
-    @Body('description') description: string,
-    @Body('ingredients') ingredients: string[],
-    @Body('isVisible') isVisible: boolean,
-    @Body('image') image: string,
-    date: Date
-  ): Promise<ArticleDocument>{
-    return this.articleService.update(id, title, description, ingredients, isVisible, image, date);
+  @UsePipes(new UpdateArticleValidationPipe())
+  async updateArticle(
+    @Param('id') id: string,
+    @Body() updateArticleDto: UpdateArticleDto,
+  ) {
+    return await this.articleService.update(id, updateArticleDto);
   }
 
   @Delete(':id')
-  delateArticle(@Param('id') id:string) {
-    return this.articleService.delate(id);
+  async deleteArticle(@Param('id') id: string) {
+    return await this.articleService.delete(id);
   }
-
 }

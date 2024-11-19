@@ -1,73 +1,108 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt/dist';
-
-import * as bcrypt from 'bcrypt';
-import { ExistingUserDTO } from 'src/user/dtos/existing-user.dto';
-import { NewUserDTO } from 'src/user/dtos/new-user.dto';
-import { UserDetails } from 'src/user/user-details.interface';
-
-import { UserService } from 'src/user/user.service';
+import { Inject, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { UserService } from '../user/user.service';
+import { AuthJwtPayload } from './types/auth-jwtPayload';
+import { CreateUserDto } from '../user/dto/create-user.dto';
+import refreshJwtConfig from './config/refresh-jwt.config';
+import { ConfigType } from '@nestjs/config';
+import * as argon2 from 'argon2';
+import { CurrentUser } from './types/current-user';
+import { LocalUser } from './types/local-user';
+import { AuthValidationService } from './auth-validation.service';
+import { RefreshTokenService } from '../refresh-token/refresh-token.service';
+import { CreateRefreshTokenDto } from '../refresh-token/dto/create-refresh-token.dto';
 
 @Injectable()
 export class AuthService {
-    constructor(private userService: UserService, private jwtService: JwtService){}
+  constructor(
+    private userService: UserService,
+    private jwtService: JwtService,
+    @Inject(refreshJwtConfig.KEY)
+    private refreshTokenConfig: ConfigType<typeof refreshJwtConfig>,
+    private authValidationService: AuthValidationService,
+    private refreshTokenService: RefreshTokenService,
+  ) {}
 
-     async hashPassword(password: string): Promise<string> {
-          return bcrypt.hash(password, 12);
-     }
+  async register(createUserDto: CreateUserDto) {
+    return this.userService.create(createUserDto);
+  }
 
-     async register(user: Readonly<NewUserDTO>): Promise<UserDetails | any>{
-          const {name,email,password}=user;
+  async login(localUser: LocalUser, deviceInfo: string, ipAddress: string) {
+    const tokens = await this.generateAndStoreTokens(
+      localUser.id,
+      deviceInfo,
+      ipAddress,
+    );
+    return { ...localUser, ...tokens };
+  }
 
-          const existingUser =  await this.userService.findByEmail(email);
+  async logout(userId: string, refreshToken: string) {
+    return this.refreshTokenService.delete(userId, refreshToken);
+  }
 
-          if(existingUser) throw new HttpException('Konto z tym e-mailem już istniej', HttpStatus.CONFLICT);
+  async logoutAllTokens(userId: string) {
+    return this.refreshTokenService.deleteAllByUserId(userId);
+  }
 
-          const hashedPassword = await this.hashPassword(password);
+  async refreshToken(userId: string, refreshToken: string) {
+    const tokens = await this.generateAndUpdateTokens(userId, refreshToken);
+    return { id: userId, ...tokens };
+  }
 
-          const newUser = await this.userService.create(name,email,hashedPassword);
+  async validateLocalUser(email: string, password: string): Promise<LocalUser> {
+    return this.authValidationService.validateLocalUser(email, password);
+  }
 
-          return this.userService._getUserDetails(newUser);
-     }
+  async validateJwtUser(userId: string): Promise<CurrentUser> {
+    return this.authValidationService.validateJwtUser(userId);
+  }
 
-     async doesPasswordMatch( password: string, hashedPassword: string): Promise<boolean> {
-               return bcrypt.compare(password,hashedPassword);
-     }
+  async validateRefreshToken(userId: string, refreshToken: string) {
+    return this.authValidationService.validateRefreshToken(
+      userId,
+      refreshToken,
+    );
+  }
 
-     async validateUser(email: string,password: string ):Promise<UserDetails|null>{
-          const user = await this.userService.findByEmail(email);
-          const doesUserExist = !!user;
+  private async generateTokens(userId: string) {
+    const payload: AuthJwtPayload = { sub: userId };
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(payload),
+      this.jwtService.signAsync(payload, this.refreshTokenConfig),
+    ]);
+    return { accessToken, refreshToken };
+  }
 
-          if(!doesUserExist) return null;
-          
-          const doesPasswordMatch = await this.doesPasswordMatch(password,user.password );
+  private async generateAndStoreTokens(
+    userId: string,
+    deviceInfo: string,
+    ipAddress: string,
+  ) {
+    const { accessToken, refreshToken } = await this.generateTokens(userId);
+    const hashedRefreshToken = await argon2.hash(refreshToken);
+    const createRefreshTokenDto: CreateRefreshTokenDto = {
+      deviceInfo,
+      ipAddress,
+      hashedRefreshToken,
+      user: userId,
+    };
 
-          if(!doesPasswordMatch) return null;
+    await this.refreshTokenService.create(createRefreshTokenDto);
+    return { accessToken, refreshToken };
+  }
 
-          return this.userService._getUserDetails(user);
-     }
+  private async generateAndUpdateTokens(
+    userId: string,
+    oldRefreshToken: string,
+  ) {
+    const { accessToken, refreshToken } = await this.generateTokens(userId);
+    const newhashedRefreshToken = await argon2.hash(refreshToken);
 
-     async login(existingUser: ExistingUserDTO):Promise<{token: string}|null>{
-          const {email, password}=existingUser;
-          const user = await this.validateUser(email,password);
-
-          if(!user) throw new HttpException('Błędne dane', HttpStatus.UNAUTHORIZED);;
-
-          const jwt = await this.jwtService.signAsync({user});
-          return {token: jwt};
-     }
-
-     async verifyJwt(jwt: string): Promise<{ exp: number }> {
-          try {
-            const { exp } = await this.jwtService.verifyAsync(jwt);
-
-            return { exp };
-
-          } catch (error) {
-               
-            throw new HttpException('Invalid JWT', HttpStatus.UNAUTHORIZED);
-          }
-     }
-
-
+    await this.refreshTokenService.updateHashedRefreshToken(
+      userId,
+      oldRefreshToken,
+      newhashedRefreshToken,
+    );
+    return { accessToken, refreshToken };
+  }
 }

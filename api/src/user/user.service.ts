@@ -1,47 +1,42 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
+import { CreateUserDto } from './dto/create-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { UserDetails } from './user-details.interface';
-import { UserDocument } from './user.schema';
+import { User } from './schemas/user.schema';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UserService {
-    constructor(
-        @InjectModel('User') private readonly userModel: Model<UserDocument>
-    ){}
+  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
-    _getUserDetails(user: UserDocument): UserDetails {
-        return{
-            id: user._id,
-            name: user.name,
-            email: user.email,
-            isAdmin: user.isAdmin
-        };
-    }
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const user = await this.userModel.findOne({ email: createUserDto.email });
 
-    async findByEmail(email: string):Promise<UserDocument | null>{
-        return this.userModel.findOne({email}).exec();
-    }
+    if (user)
+      throw new ConflictException('User with this email already exists');
 
-    async findById(id: string):Promise<UserDetails | null>{
-        const user= await this.userModel.findById(id).exec();
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+    const newUser = new this.userModel({
+      ...createUserDto,
+      password: hashedPassword,
+    });
 
-        if(!user) return null;
+    return newUser.save();
+  }
 
-        return this._getUserDetails(user)
-    }
+  async findByEmail(email: string): Promise<User | null> {
+    return this.userModel.findOne({ email }).select('+password');
+  }
 
-    async create(
-        name: string,
-        email: string,
-        hashedPassword: string,
-    ): Promise<UserDocument>{
-        const newUser = new this.userModel({
-            name,
-            email,
-            password: hashedPassword,
-        });
+  async findById(id: string): Promise<User | null> {
+    const user = await this.userModel.findById(id);
 
-        return newUser.save();
-    }
+    if (!user) return null;
+
+    return user;
+  }
+
+  async getAll() {
+    return await this.userModel.find();
+  }
 }

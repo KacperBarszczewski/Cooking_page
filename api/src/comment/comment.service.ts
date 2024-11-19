@@ -1,31 +1,70 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { CommentDocument } from './comment.schema';
+import mongoose, { Model } from 'mongoose';
+import { Comment, CommentDocument } from './schemas/comment.schema';
+import { CreateCommentDto } from './dto/create-comment.dto';
+import { CurrentUser } from '../auth/types/current-user';
+import { ArticleService } from 'src/article/article.service';
 
 @Injectable()
 export class CommentService {
+  constructor(
+    @InjectModel(Comment.name) private commentModel: Model<Comment>,
+    private articleService: ArticleService,
+  ) {}
 
-    constructor(
-        @InjectModel('Comment')
-        private readonly commentModel: Model<CommentDocument>
-        ){}
+  async create(
+    comment: CreateCommentDto,
+    user: CurrentUser,
+  ): Promise<CommentDocument> {
+    const data = Object.assign(comment, { user: user.id });
 
-        async create(
-            name: string,
-            text: string,
-            article_id: string,
-            isVisible: boolean,
-            ): Promise<CommentDocument>{
-            const newComment = new this.commentModel({name,text,article_id,isVisible});
-            return newComment.save();
-        }
+    const newComment = new this.commentModel(data);
+    const savedComment = await newComment.save();
 
-        async findAll(): Promise<CommentDocument[]>{
-            return this.commentModel.find().exec();
-        }
+    this.articleService.addCommentIdByArticleID(
+      comment.article_id,
+      savedComment.id,
+    );
 
-        async find(a_id: string): Promise<CommentDocument[]>{
-            return this.commentModel.find({article_id: a_id}).exec();
-        }
+    return savedComment;
+  }
+
+  async findAll(): Promise<Comment[]> {
+    return this.commentModel.find().populate('user', 'name email');
+  }
+
+  async findById(id: string): Promise<Comment> {
+    const isValidId = mongoose.isValidObjectId(id);
+    if (!isValidId) throw new BadRequestException('Incorrect ID');
+
+    const comment = await this.commentModel.findById(id);
+    if (!comment) throw new NotFoundException('Comment not found');
+
+    return comment;
+  }
+
+  async updateById(id: string, comment: Comment): Promise<Comment> {
+    return await this.commentModel.findByIdAndUpdate(id, comment, {
+      new: true,
+      runValidators: true,
+    });
+  }
+
+  async deleteById(id: string): Promise<Comment> {
+    const deletedComment = await this.commentModel.findByIdAndDelete(id);
+
+    if (!deletedComment) throw new NotFoundException('Comment not found');
+
+    this.articleService.deleteCommentIdByArticleID(
+      deletedComment.article_id.toString(),
+      id,
+    );
+
+    return deletedComment;
+  }
 }
