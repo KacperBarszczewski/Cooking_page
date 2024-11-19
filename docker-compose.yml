@@ -42,17 +42,17 @@ services:
     networks:
       - myNetwork
 
-  cooking_app:
-    container_name: cooking_app
-    environment:
-      - REACT_APP_BASE_API=api:3000/api
-    build: ./cooking_app
-    ports:
-      - "8080:80"
-    depends_on:
-      - api
-    networks:
-      - myNetwork
+  # cooking_app:
+  #   container_name: cooking_app
+  #   environment:
+  #     - REACT_APP_BASE_API=api:3000/api
+  #   build: ./cooking_app
+  #   ports:
+  #     - "8080:80"
+  #   depends_on:
+  #     - api
+  #   networks:
+  #     - myNetwork
 
 networks:
   myNetwork:
